@@ -1,0 +1,28 @@
+<div id="editHashFieldModal" class="modal hide fade">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal">×</button>
+    <h3>Edit Hash Field</h3>
+  </div>
+  <div class="modal-body">
+    <form id="editHashFieldForm" action="apiv2/hash/field/edit" method="POST" class="form-vertical">
+      <label class="control-label" for="hashKey">Key</label>
+      <input id="hashKey" name="key" type="text" class="modal-content-width" readonly/>
+      <label class="control-label" for="hashField">Field</label>
+      <input id="hashField" name="field" type="text" class="modal-content-width" readonly/>
+      <label class="control-label" for="hashFieldValue">Value</label>
+      <textarea id="hashFieldValue" name="value" class="modal-content-width" style="height: 200px;"></textarea>
+      <label class="checkbox"><input type="checkbox" id="hashFieldIsJson" name="isJson">Validate as JSON</label>
+      <input id="hashConnectionId" name="connectionId" type="hidden"/>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button class="btn" data-dismiss="modal">Close</button>
+    <button id="removeHashFieldButton" class="btn btn-danger" data-loading-text="<i class='icon-refresh'></i> Removing..." onclick="removeHashField()">Remove Field</button>
+    <button id="editHashFieldButton" class="btn btn-primary" data-loading-text="<i class='icon-refresh'></i> Saving..." onclick="$('#editHashFieldForm').trigger('submit')">Save</button>
+  </div>
+</div>
+<script>
+  setupEditDataModals('editHashFieldForm', 'editHashFieldButton');
+  setupJsonInputValidator('hashFieldIsJson', 'hashFieldValue');
+  registerModalFocus('editHashFieldModal', 'hashFieldValue');
+</script>

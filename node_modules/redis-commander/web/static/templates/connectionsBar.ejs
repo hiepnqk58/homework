@@ -1,0 +1,14 @@
+<% connections.forEach(function(connection, index) {%>
+<button type="button"
+<% if (index == 0) { %>
+        id="firstConnection"  class="btn btn-primary active"
+<% } else { %>
+        class="btn btn-primary"
+<% } %>
+        value='<%= connection.conId %>'
+        data-label="<%= connection.label %>"
+        data-visibleid="<%= connection.options.host + ':' + connection.options.port + ':' + connection.options.db %>"
+        onclick="setConnection(event.target);">
+    <%= connection.label + ' (' + connection.options.host + ':' + connection.options.port + ':' + connection.options.db + ')' %>
+</button>
+<% }); %>

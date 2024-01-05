@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Redis Commander: <%= title %></title>
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="stylesheet" href="bootstrap/css/bootstrap.css"/>
+  <style type="text/css">
+    body {
+      padding-top: 40px;
+      padding-bottom: 40px;
+    }
+  </style>
+  <link rel="stylesheet" href="css/default.css"/>
+  <link rel="stylesheet" href="jstree/themes/default/style.min.css"/>
+  <link rel="stylesheet" href="json-viewer/jquery.json-viewer.css">
+
+  <script src="scripts/browserify.js"></script>
+  <script src="scripts/jquery-2.2.4.js"></script>
+  <script src="jstree/jstree.js"></script>
+  <script src="clipboard/clipboard.min.js"></script>
+  <script src="json-viewer/jquery.json-viewer.js"></script>
+  <script src="scripts/jquery.resize.min.js"></script>
+  <script src="scripts/ejs.min.js"></script>
+  <script src="dateformat/dateformat.js"></script>
+  <script src="scripts/redisCommander.js"></script>
+  <script src="scripts/binaryView.js"></script>
+  <script src="bootstrap/js/bootstrap.js"></script>
+</head>
+<body>
+<div class="navbar navbar-fixed-top">
+  <div class="navbar-inner">
+    <a class="brand" href="./"><img src="images/RedisCommandLogo.png"/></a>
+  </div>
+</div>
+
+<%- body %>
+
+<% if (!redisReadOnly) { %>
+  <%- include('modals/addListValueModal') %>
+  <%- include('modals/addSetMemberModal') %>
+  <%- include('modals/addZSetMemberModal') %>
+  <%- include('modals/addXSetMemberModal') %>
+  <%- include('modals/addHashFieldModal') %>
+  <%- include('modals/editZSetMemberModal') %>
+  <%- include('modals/editSetMemberModal') %>
+  <%- include('modals/editListValueModal') %>
+  <%- include('modals/addKeyModal') %>
+  <%- include('modals/renameKeyModal') %>
+  <%- include('modals/editHashFieldModal') %>
+<% } %>
+<%- include('modals/signinModal') %>
+</body>
+</html>

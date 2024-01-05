@@ -1,0 +1,39 @@
+{
+  "noSave": "NOSAVE",
+  "noLogData": "NO_LOG_DATA",
+  "ui": {
+    "foldingChar": "FOLDING_CHAR",
+    "jsonViewAsDefault": "VIEW_JSON_DEFAULT",
+    "binaryAsHex": "BINARY_AS_HEX",
+    "maxHashFieldSize": "MAX_HASH_FIELD_SIZE"
+  },
+  "redis": {
+    "readOnly": "READ_ONLY",
+    "flushOnImport": "FLUSH_ON_IMPORT",
+    "useScan": "USE_SCAN",
+    "scanCount": "SCAN_COUNT",
+    "rootPattern": "ROOT_PATTERN",
+    "connectionName": "REDIS_CONNECTION_NAME",
+    "defaultLabel": "REDIS_LABEL"
+  },
+  "server": {
+    "address": "ADDRESS",
+    "port": "PORT",
+    "urlPrefix": "URL_PREFIX",
+    "signinPath": "SIGNIN_PATH",
+    "trustProxy": "TRUST_PROXY",
+    "clientMaxBodySize": "CLIENT_MAX_BODY_SIZE",
+    "httpAuth": {
+      "username": "HTTP_USER",
+      "password": "HTTP_PASSWORD",
+      "passwordHash": "HTTP_PASSWORD_HASH"
+    }
+  },
+  "sso": {
+    "enabled": "SSO_ENABLED",
+    "jwtSharedSecret": "SSO_JWT_SECRET",
+    "allowedIssuer": "SSO_ISSUER",
+    "audience": "SSO_AUDIENCE",
+    "subject": "SSO_SUBJECT"
+  }
+}

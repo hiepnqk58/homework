@@ -1,0 +1,53 @@
+.icon-home:before {
+  color: rgba(33, 150, 243);
+}
+.icon-gitlab:before {
+  color: #ff7588;
+}
+.icon-cpu:before {
+  color: #16d39a;
+}
+.icon-command:before {
+  color: #ffb64d;
+}
+.icon-clipboard:before {
+  color: #39adb5;
+}
+.pcoded-main-container {
+  margin: 5rem 2rem 0 2rem !important;
+}
+/* .header-navbar {
+  position: relative !important;
+} */
+.icon-cpu:before {
+  color: white !important;
+}
+
+.icon-home:before {
+  color: white !important;
+}
+
+#tree-list {
+  min-height: 600px;
+}
+
+#tree-list-unit {
+  max-height: 600px;
+}
+
+div[page='home'] .card {
+  min-height: 9rem !important;
+}
+section[name='logout'] div.dropdown-menu {
+  left: -56px !important;
+}
+.header-fixed {
+  position: fixed;
+  width: 100%;
+  height: fit-content;
+  z-index: 100000000;
+  top: 0px;
+}
+.ant-select-dropdown {
+  z-index: 100000001;
+}

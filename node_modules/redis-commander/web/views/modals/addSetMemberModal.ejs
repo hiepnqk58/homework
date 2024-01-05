@@ -1,0 +1,24 @@
+<div id="addSetMemberModal" class="modal hide fade">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal">×</button>
+    <h3>Add Member</h3>
+  </div>
+  <div class="modal-body">
+    <form id="addSetMemberForm" action="apiv2/set/member/add" method="POST" class="form-vertical label-big">
+      <input id="addSetKey" name="key" type="hidden"/>
+      <label class="control-label lead" for="addSetMemberName">Member</label>
+      <textarea id="addSetMemberName" name="value" class="modal-content-width" style="height: 250px;"></textarea>
+      <label class="checkbox"><input type="checkbox" id="addSetMemberIsJson" name="isJson">Validate as JSON</label>
+      <input id="addSetConnectionId" name="connectionId" type="hidden"/>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button class="btn" data-dismiss="modal">Close</button>
+    <button id="saveMemberButton" class="btn btn-primary" data-loading-text="<i class='icon-refresh'></i> Saving..." onclick="$('#addSetMemberForm').trigger('submit')">Save</button>
+  </div>
+</div>
+<script>
+  setupEditDataModals('addSetMemberForm', 'saveMemberButton');
+  setupJsonInputValidator('addSetMemberIsJson', 'addSetMemberName');
+  registerModalFocus('addSetMemberModal', 'addSetMemberName');
+</script>

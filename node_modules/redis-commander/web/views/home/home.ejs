@@ -1,0 +1,223 @@
+<div id="app-container">
+  <div id="sideBar">
+    <div id="keyTreeActions">
+      <button class="btn btn-success btn-mini" onclick="refreshTree()"><b class="icon-refresh icon-white"></b> Refresh</button>
+      <button class="btn btn-mini" onclick="toggleRedisModal()"><b class="icon-info-sign"></b> Commands</button>
+      <div class="btn-group">
+        <a class="btn btn-mini dropdown-toggle" data-toggle="dropdown" href="#">
+          <b class="icon-wrench"></b>
+          More...
+          <span class="caret"></span>
+        </a>
+        <ul class="dropdown-menu">
+          <li><a data-toggle="modal" id="refreshNodes" href="#"><b class="icon-refresh"></b><b class="icon-empty"></b> Refresh All Nodes</a></li>
+          <li><a data-toggle="modal" id="expandAllNodes" href="#"><b class="icon-refresh"></b><b class="icon-fullscreen"></b> Refresh + Expand All Nodes</a></li>
+          <% if (!redisReadOnly) { %>
+          <li><a data-toggle="modal" id="redisImportData" href="#"><b class="icon-arrow-right"></b><b class="icon-th"></b> Import</a></li>
+          <% } %>
+          <li><a data-toggle="modal" id="redisExportData" href="#"><b class="icon-arrow-left"></b><b class="icon-th"></b> Export</a></li>
+          <li><a data-toggle="modal" href="#addServerModal"><b class="icon-plus-sign"></b><b class="icon-empty"></b> Add Server</a></li>
+        </ul>
+      </div>
+    </div>
+    <div id="keyTree"></div>
+    <div id="sidebarResize"></div>
+  </div>
+
+  <div id="body">
+  </div>
+</div>
+<div id="commandLineContainer">
+  <div id="commandLineBorder" style="border-top: 1px solid #ddd;padding-bottom: 5px;"></div>
+  <div class="btn-group" data-toggle="buttons-radio" style="padding-bottom: 5px; padding-left: 5px" id="connectionsBar">
+  </div>
+  <div style="border-top: 1px solid #ddd;padding-bottom: 5px;"></div>
+  <i id="lockCommandButton" class="icon-lock disabled"></i>
+
+  <div id="commandLineOutput"></div>
+  <label id="selectedConnectionLabel">Current Server:</label>
+  <input id="selectedConnection" type="hidden">
+
+  <div id="commandLine"></div>
+</div>
+
+<!-- COMMANDS AND CONNECTION MODALS -->
+<div id="redisCommandsModal" class="modal hide fade">
+  <a id="redisCommandsExternal" target="_blank" href="">Open in new window</a>
+  <button id="redisCommandsClose" type="button" class="close" data-dismiss="modal">×</button>
+  <div class="modal-body">
+    <iframe id="redisCommandsModalSrc" seamless="seamless" src="">test</iframe>
+  </div>
+</div>
+
+<div id="addServerModal" class="modal hide fade">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal">×</button>
+    <h3>Add a connection</h3>
+  </div>
+  <div class="modal-body" id="addServerContainer">
+    <form action="login" method="POST" id="addServerForm" class="form-vertical">
+      <label for="label">Display-Name</label>
+      <input type="text" name="label" id="label" value="" class="span6" required>
+      <div class="control-group">
+        <label class="control-label" for="serverType">Server Type</label>
+        <div class="controls">
+          <select id="serverType" name="serverType">
+            <option value="redis">Standalone Redis-Server</option>
+            <option value="sentinel">Sentinel</option>
+            <!--option value="cluster">Cluster</option-->
+          </select>
+        </div>
+      </div>
+      <div id="addServerGroupRedis">
+        <label for="hostname">Hostname or Unix Socket Path</label>
+        <input type="text" name="hostname" id="hostname" value="localhost" class="span6" required>
+        <label for="port">Port</label>
+        <input type="number" name="port" id="port" value="6379">
+      </div>
+      <div id="addServerGroupSentinel">
+        <label for="sentinelName">Sentinel Group Name</label>
+        <input type="text" name="sentinelName" id="sentinelName" value="<%= sentinelDefaultGroupName %>" class="span6" required>
+        <label for="sentinels">List of sentinels</label>
+        <input type="text" name="sentinels" id="sentinels" value="localhost:26379" class="span6" required>
+        <div>Add comma-separated list of sentinels with "host-1:port,host-2 ..."</div>
+        <br>
+        <label class="radio inline">
+          <input type="radio" name="sentinelPWType" value="none" checked>
+          No password
+        </label>
+        <label class="radio inline">
+          <input type="radio" name="sentinelPWType" value="redis">
+          Same as Redis server
+        </label>
+        <label class="radio inline">
+          <input type="radio" name="sentinelPWType" value="sentinel">
+          Explicit Sentinel password
+        </label>
+        <label for="sentinelPassword" class="muted">Password for Sentinels</label>
+        <input type="password" name="sentinelPassword" id="sentinelPassword" value="" class="span6" disabled>
+        <hr style="margin-right: 24px">
+      </div>
+      <label for="password">Redis Server Password</label>
+      <input type="password" name="password" id="password" value="" class="span6">
+      <label for="dbIndex">Database Index</label>
+      <input type="number" name="dbIndex" id="dbIndex" value="0" required>
+      <label for="usetls">UseTLS <input type="checkbox" name="usetls" id="usetls" class="checkbox-oneline"></label>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <a href="#" class="btn" data-dismiss="modal">Close</a>
+    <a type="button" onclick="detectServerDB()" class="btn" id="detectServerBtn">Find Used DB</a>
+    <a type="button" onclick="addServer()" class="btn btn-primary" id="addServerBtn">Connect...</a>
+  </div>
+</div>
+
+<div id="selectServerDbModal" class="modal hide fade">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal">×</button>
+    <h3>Select databases to connect</h3>
+  </div>
+  <div class="modal-body" id="selectServerDbContainer">
+  </div>
+  <div class="modal-footer">
+    <a href="#" class="btn" data-dismiss="modal" onclick="clearAddServerForm()">Close</a>
+    <a type="button" onclick="selectNewServerDbs()" class="btn btn-primary" id="selectServerDbBtn">Connect...</a>
+  </div>
+</div>
+
+<!-- /COMMANDS MODAL -->
+
+<script type="text/javascript">
+  const httpAuthDisabled = <%= httpAuthDisabled %>;
+  const foldingCharacter = '<%= foldingCharacter %>';
+  const redisReadOnly = <%= redisReadOnly %>;
+  const signinPath = '<%= signinPath %>';
+
+  const setConnection = function (connectionBtn) {
+    $('#selectedConnectionLabel').text('Current Instance: "' + connectionBtn.dataset.label +
+            '" (' + connectionBtn.dataset.visibleid + ')');
+    $('#selectedConnection').val(connectionBtn.value);
+  };
+
+  $(function () {
+    $(window).on('beforeunload', 'clearStorage', function() {
+      sessionStorage.clear();
+    });
+    $.ajaxSetup({
+      beforeSend: function(jqXHR) {
+        var redisCommanderBearerToken = sessionStorage.getItem('redisCommanderBearerToken');
+        if (!httpAuthDisabled && redisCommanderBearerToken) {
+          jqXHR.setRequestHeader('Authorization', 'Bearer ' + redisCommanderBearerToken);
+        }
+      }
+    });
+    function refreshToken() {
+      $.post(signinPath, {}, function (data, status) {
+        if (status !== 'success') {
+          console.error("refresh token connection problem");
+          return;
+        }
+        if (!data || !data.ok) {
+          sessionStorage.removeItem('redisCommanderBearerToken');
+          sessionStorage.removeItem('redisCommanderQueryToken');
+          $('#signinModal').modal({
+            backdrop: 'static',
+            keyboard: false,
+            show: true
+          });
+          return;
+        }
+        var oldToken = sessionStorage.getItem('redisCommanderBearerToken');
+        sessionStorage.setItem('redisCommanderBearerToken', data.bearerToken);
+        sessionStorage.setItem('redisCommanderQueryToken', data.queryToken);
+        if (!oldToken) {
+          $(window).off('beforeunload', 'clearStorage');
+          location.reload();
+        }
+        setTimeout(refreshToken, 20e3);
+      })
+      .fail(function(err) {
+        console.error("Signin network error", err);
+        setTimeout(refreshToken, 5e3);
+      })
+    }
+
+    refreshToken();
+    if (!sessionStorage.getItem('redisCommanderBearerToken')) {
+      return;
+    }
+    $.get('connections', function(data, status) {
+      if (status !== 'success') {
+        console.error("Failed to fetch connections");
+        return;
+      }
+      renderEjs('templates/connectionsBar.ejs', data, $('#connectionsBar'), function() {
+        setConnection(document.getElementById('firstConnection'));
+      });
+
+      initCmdParser();
+      loadTree();
+      loadConfig(function () {
+        setupResizeEvents();
+        $('html').css('overflow-y', 'hidden');
+        $('#pageIndex').on('keydown', function (e) {
+          if (e.keyCode === 13) {
+            $('#gotoIndexButton').trigger('click');
+          }
+        });
+        $('#redisCommandsModal').modal({
+          backdrop: false,
+          keyboard: false,
+          show: false
+        });
+      });
+      redisCli.loadCommandLine();
+      redisCli.setupCommandLock();
+      redisCli.setupCLIKeyEvents();
+      setupAddServerForm();
+    })
+    .fail(function(err) {
+      console.error("Failed to fetch connections", err);
+    });
+  });
+</script>

@@ -1,0 +1,33 @@
+<div id="addListValueModal" class="modal hide fade">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal">×</button>
+    <h3>Add Value</h3>
+  </div>
+  <div class="modal-body">
+    <form id="addListValueForm" action="apiv2/list/value/add" method="POST" class="form-vertical label-big">
+      <input id="key" name="key" type="hidden"/>
+      <label class="radio inline">
+        <input id="typeLpush" type="radio" name="type" value="lpush" checked="checked"/>
+        LPUSH
+      </label>
+      <label class="radio inline">
+        <input id="typeRpush" type="radio" name="type" value="rpush"/>
+        RPUSH
+      </label>
+      <br/>
+      <label class="control-label lead" for="addListValue">Value</label>
+      <textarea id="addListValue" name="value" class="modal-content-width" style="height: 250px;"></textarea>
+      <label class="checkbox"><input type="checkbox" id="addListValueIsJson" name="isJson">Validate as JSON</label>
+      <input id="addListConnectionId" name="connectionId" type="hidden"/>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button class="btn" data-dismiss="modal">Close</button>
+    <button id="saveValueButton" class="btn btn-primary" data-loading-text="<i class='icon-refresh'></i> Saving..." onclick="$('#addListValueForm').trigger('submit')">Save</button>
+  </div>
+</div>
+<script>
+  setupEditDataModals('addListValueForm', 'saveValueButton');
+  setupJsonInputValidator('addListValueIsJson', 'addListValue');
+  registerModalFocus('addListValueModal', 'addListValue');
+</script>

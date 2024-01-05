@@ -1,0 +1,27 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis
+  annotations:
+    container.apparmor.security.beta.kubernetes.io/redis-commander: runtime/default
+    container.security.alpha.kubernetes.io/redis-commander: runtime/default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+        tier: backend
+    spec:
+      automountServiceAccountToken: false
+      containers:
+        - name: redis
+          image: redis
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: redis
+              containerPort: 6379

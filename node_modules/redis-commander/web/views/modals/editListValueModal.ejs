@@ -1,0 +1,28 @@
+<div id="editListValueModal" class="modal hide fade">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal">×</button>
+    <h3>Edit Row</h3>
+  </div>
+  <div class="modal-body">
+    <form id="editListValueForm" action="apiv2/list/value/edit" method="POST" class="form-vertical">
+      <label class="control-label" for="listKey">Key</label>
+      <input id="listKey" name="key" type="text" class="modal-content-width" readonly/>
+      <label class="control-label" for="listIndex">Index</label>
+      <input id="listIndex" name="index" type="text" readonly/>
+      <label class="control-label" for="listValue">Value</label>
+      <textarea id="listValue" name="value" class="modal-content-width" style="height: 220px;"></textarea>
+      <label class="checkbox"><input type="checkbox" id="listValueIsJson" name="isJson">Validate as JSON</label>
+      <input id="editListConnectionId" name="connectionId" type="hidden"/>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button class="btn" data-dismiss="modal">Close</button>
+    <button id="removeListValueButton" class="btn btn-danger" data-loading-text="<i class='icon-refresh'></i> Removing..." onclick="removeListElement()">Remove Element</button>
+    <button id="editListValueButton" class="btn btn-primary" data-loading-text="<i class='icon-refresh'></i> Saving..." onclick="$('#editListValueForm').trigger('submit')">Save</button>
+  </div>
+</div>
+<script>
+  setupEditDataModals('editListValueForm', 'editListValueButton');
+  setupJsonInputValidator('listValueIsJson', 'listValue');
+  registerModalFocus('editListValueModal', 'listValue');
+</script>

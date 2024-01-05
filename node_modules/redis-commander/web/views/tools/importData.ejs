@@ -1,0 +1,56 @@
+<div>
+<h2>Import</h2>
+<form class="form-horizontal small-label" id="redisImportForm">
+  <div class="control-group">
+    <label class="control-label" for="connectionImportField">Connection</label>
+    <div class="controls">
+      <select id="connectionImportField" name="connection" class="redisDumpSelect">
+        <% connections.forEach(function(connection, index) {%>
+        <% if (index == 0) { %>
+        <option value="<%=connection.conId %>"><%=connection.label%> (<%=connection.options.host%>:<%=connection.options.port%>:<%=connection.options.db %>)</option>
+        <% } else { %>
+        <option value="<%=connection.conId %>"><%=connection.label%> (<%=connection.options.host%>:<%=connection.options.port%>:<%=connection.options.db %>)</option>
+        <% }}); %>
+      </select>
+    </div>
+  </div>
+  <div class="control-group">
+    <label class="control-label" for="importData">
+        Data<br><br>
+        <span class="muted">
+            SET<br>
+            HSET<br>
+            LPUSH<br>
+            LPUSHX<br>
+            RPUSH<br>
+            RPUSHX<br>
+            LSET<br>
+            SADD<br>
+            ZADD<br>
+            LTRIM
+        </span>
+    </label>
+    <div class="controls">
+      <textarea name="data" id="importData"></textarea>
+    </div>
+  </div>
+  <div class="control-group">
+    <label class="control-label" for="flushDb">Flush DB</label>
+    <div class="controls">
+      <input type="checkbox" name="clear" value="1" id="flushDb" <%= flushOnImport %> />
+    </div>
+  </div>
+  <div class="control-group">
+    <div class="controls">
+      <input type="submit" class="btn btn-primary" value="Import">
+    </div>
+  </div>
+  <div class="control-group">
+    <div class="controls">
+    Redis DUMPs can be imported too when the binary data part is base64 encoded. This format can be created by the "Export"
+    function from the menu (DUMP-BASE64) or with custom export scripts like:<br><br>
+    <code>RESTORE &lt;key&gt; &lt;ttl|0&gt; &lt;base64 encoded binary data from DUMP&gt;</code>
+    </div>
+  </div>
+</form>
+</div>

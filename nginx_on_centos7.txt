@@ -1,0 +1,207 @@
+ // run nginx in centos 7
+setsebool -P httpd_enable_homedirs 1
+setenforce 0
+systemctl restart nginx
+systemctl daemon-reload
+
+ server {
+        listen       80;
+        listen       [::]:80;
+        server_name  10.32.129.245;
+       #root         /usr/share/nginx/html;
+
+        # Load configuration files for the default server block.
+        include /etc/nginx/default.d/*.conf;
+#         location / {
+          root  /var/www/update/file_server/;
+          autoindex on;
+
+ #       }
+        error_page 404 /404.html;
+        location = /404.html {
+        }
+
+        error_page 500 502 503 504 /50x.html;
+        location = /50x.html {
+        }
+    }
+
+
+
+
+
+https:
+
+
+server {
+    listen 443 http2 ssl;
+    listen [::]:443 http2 ssl;
+
+    server_name 86.fms.bqp;
+
+    ssl_certificate /etc/ssl/certs/nginx-selfsigned.crt;
+    ssl_certificate_key /etc/ssl/private/nginx-selfsigned.key;
+    ssl_dhparam /etc/ssl/certs/dhparam.pem;
+
+
+    location / {
+          root  /var/www/build/;
+          index  index.html index.htm;
+          try_files $uri $uri/ /index.html;
+     }
+
+}
+
+=================================== https ====================================
+
+server {
+    listen 443 http2 ssl;
+    listen [::]:443 http2 ssl;
+
+    server_name 86.fms.bqp;
+
+    ssl_certificate /etc/ssl/certs/nginx-selfsigned.crt;
+    ssl_certificate_key /etc/ssl/private/nginx-selfsigned.key;
+    ssl_dhparam /etc/ssl/certs/dhparam.pem;
+
+
+    location / {
+          root  /var/www/build/;
+          index  index.html index.htm;
+          try_files $uri $uri/ /index.html;
+     }
+    location /api {
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Host $host;
+        proxy_pass https://127.0.0.1:4000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        # location /overview {
+        #     proxy_pass http://127.0.0.1:3000$request_uri;
+        #     proxy_redirect off;
+        # }
+    }
+   }
+
+=================================== https ====================================
+
+
+
+
+Tệp cấu hình SELinux được lưu trữ trong thư mục /etc/selinux/ trên hầu hết các hệ thống sử dụng SELinux, bao gồm CentOS 7.
+
+Tệp cấu hình chính của SELinux trên CentOS 7 là /etc/selinux/config. Bạn có thể sử dụng trình soạn thảo văn bản như vi, nano hoặc gedit để mở tệp cấu hình này và sửa đổi các cài đặt SELinux.
+
+Lưu ý rằng, trước khi sửa đổi tệp cấu hình SELinux, bạn nên sao lưu tệp cấu hình ban đầu để phục hồi nếu cần thiết.
+
+Sau khi thay đổi tệp cấu hình SELinux, bạn có thể kiểm tra lại để đảm bảo rằng các thay đổi đã được áp dụng bằng cách sử dụng lệnh getsebool hoặc semanage. Ví dụ, để kiểm tra trạng thái của cờ httpd_enable_homedirs, bạn có thể sử dụng lệnh getsebool httpd_enable_homedirs hoặc semanage boolean -l | grep httpd_enable_homedirs.
+
+
+============================================Mở port=========================================================
+
+vi /etc/firewalld/zones/public.xml
+
+<port protocol="tcp" port="80"/>
+<port protocol="tcp" port="443"/>
+<port protocol="tcp" port="3306"/>
+<port protocol="tcp" port="5432"/>
+
+hoăc:
+sudo firewall-cmd --add-port=<port>/tcp --permanent
+sudo firewall-cmd --reload
+
+<service>
+   <short>http</short>
+   <description>HTTP</description>
+   <port protocol="tcp" port="80"/>
+</service>
+
+sudo firewall-cmd --zone=public --remove-port=27017/tcp --permanent // đóng cổng 
+
+systemctl start firewalld
+
+
+Để Nginx được khởi động cùng hệ thống trên CentOS 7, bạn có thể sử dụng lệnh systemctl enable nginx. Lệnh này sẽ tạo một liên kết tượng trưng cho file cấu hình của Nginx trong thư mục /etc/systemd/system/multi-user.target.wants/. Khi hệ thống khởi động, systemd sẽ đọc các liên kết trong thư mục này để khởi động các dịch vụ.
+
+Sau khi thực hiện lệnh này, bạn có thể kiểm tra lại bằng lệnh systemctl is-enabled nginx. Nếu kết quả trả về là enabled, tức là Nginx đã được thiết lập để khởi động cùng hệ thống.
+
+
+
+
+============================cấu hình HAproxy server============================================================ 
+
+
+
+
+
+
+===============================================================================================================
+
+
+Để cấu hình haproxy trỏ đến các server khác nhau dựa trên các path khác nhau, bạn có thể sử dụng tùy chọn acl và use_backend trong tệp cấu hình haproxy.
+
+Ví dụ, nếu bạn muốn trỏ đến một server khác khi yêu cầu có đường dẫn /app1, và trỏ đến server khác nếu yêu cầu có đường dẫn /app2, bạn có thể sử dụng các dòng sau trong tệp cấu hình haproxy:
+
+bash
+Copy code
+frontend http-in
+    bind *:80
+    acl app1_path path_beg /app1
+    use_backend app1_backend if app1_path
+    acl app2_path path_beg /app2
+    use_backend app2_backend if app2_path
+
+backend app1_backend
+    server app1_server 192.168.1.101:80
+
+backend app2_backend
+    server app2_server 192.168.1.102:80
+Trong ví dụ này, tùy chọn acl được sử dụng để kiểm tra xem yêu cầu có chứa đường dẫn /app1 hoặc /app2 hay không. Nếu yêu cầu có chứa đường dẫn này, haproxy sẽ sử dụng tùy chọn use_backend để trỏ đến backend tương ứng.
+
+Các backend app1_backend và app2_backend được cấu hình để trỏ đến server khác nhau. Trong ví dụ này, app1_backend sẽ trỏ đến server có địa chỉ IP 192.168.1.101 trên cổng 80, và app2_backend sẽ trỏ đến server có địa chỉ IP 192.168.1.102 trên cổng 80.
+
+Sau khi bạn đã cấu hình tệp cấu hình haproxy như trên, bạn nên khởi động lại haproxy và kiểm tra xem nó có hoạt động đúng như mong đợi hay không.
+
+
+
+
+FIX MONGO
+chown -R mongod:mongod /var/lib/mongo/
+chown mongod:mongod /tmp/mongodb-27017.sock
+
+systemctl restart mongod
+
+
+
+Để chặn việc sinh file core trên Linux, bạn có thể thực hiện một số bước sau:
+
+Giới Hạn Core Dump:
+
+Bạn có thể giảm giới hạn core dump bằng cách sử dụng lệnh ulimit. Ví dụ, để vô hiệu hóa việc sinh file core, bạn có thể sử dụng:
+bash
+Copy code
+ulimit -c 0
+Nếu bạn muốn giới hạn dung lượng file core, bạn có thể đặt một giá trị khác thay vì 0.
+Sử Dụng systemd-coredump:
+
+Trên các hệ thống sử dụng systemd (bao gồm CentOS 7), systemd-coredump quản lý core dumps. Bạn có thể sửa đổi cấu hình của nó bằng cách chỉnh sửa file /etc/systemd/coredump.conf. Đối với việc tắt core dumps, bạn có thể đặt Storage=none.
+Sử Dụng sysctl:
+
+Bạn cũng có thể sử dụng sysctl để điều chỉnh cấu hình kernel liên quan đến core dump. Chẳng hạn, để tắt core dumps, bạn có thể chạy:
+bash
+Copy code
+sysctl -w kernel.core_pattern=core
+Thêm Cấu Hình vào File /etc/security/limits.conf:
+
+Một cách khác để giảm giới hạn core dump là thêm cấu hình vào file /etc/security/limits.conf. Ví dụ, thêm dòng sau:
+markdown
+Copy code
+* hard core 0
+Sửa Đổi Cấu Hình Trong File /etc/security/limits.d/20-nproc.conf:
+
+Trong một số trường hợp, file /etc/security/limits.d/20-nproc.conf có thể chứa giới hạn về core dump. Bạn có thể sửa đổi giá trị * hard core trong file này.
+Tắt Apport (Đối với Ubuntu):
+
+Trên Ubuntu, có một dịch vụ gọi là Apport có thể tạo ra core dumps. Bạn có thể tắt Apport bằng cách chỉnh sửa file /etc/default/apport và đặt enabled=0.
+Lưu ý rằng việc tắt core dumps có thể làm mất đi khả năng debug khi ứng dụng gặp lỗi. Nếu bạn đang phát triển hoặc duyệt web với ứng dụng, quan trọng là theo dõi và giải quyết các lỗi để cải thiện sự ổn định của hệ thống.
