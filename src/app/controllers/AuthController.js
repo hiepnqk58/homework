@@ -17,7 +17,7 @@ const { successResponse, errorResponse } = require("../../helper/responseJson");
     username: req.body.username,
     password_hash: req.body.password,
     role: config.role.superAdmin,
-    condition: { },
+    condition: {},
   };
   const checkUserName = await userModel.checkExistingField(
     "username",
@@ -47,17 +47,13 @@ module.exports.login = async (req, res) => {
   let isValidPassword = user
     ? await user.comparePassword(req.body.password)
     : false;
-    console.log(req.body.password)
+  console.log(req.body.password);
   try {
     if (user && isValidPassword) {
-      const { _id, username, role, condition } = user;      
-      var token = jwt.sign(
-        { _id, username, role, condition },
-        config.secret,
-        {
-          expiresIn: config.expiresIn,
-        }
-      );
+      const { _id, username, role, condition } = user;
+      var token = jwt.sign({ _id, username, role, condition }, config.secret, {
+        expiresIn: config.expiresIn,
+      });
 
       // await client.set(_id.toString(), token, "EX", 60 * 60);
       data = {
@@ -66,10 +62,9 @@ module.exports.login = async (req, res) => {
         display_name: user.display_name,
         role: user.role,
         token: token,
-        condition
+        condition,
       };
-      console.log(data)
-      return successResponse(res, [data], 200, "Success");
+      return successResponse(res, data, 200, "Success");
     }
   } catch (err) {
     return errorResponse(res, 401, "Token is fail");
@@ -147,7 +142,7 @@ module.exports.changeInformation = async (req, res) => {
     let data = await userModel.findByIdAndUpdate(id, userData, { new: true });
     return successResponse(res, data, 200, "Change information success!");
   } else {
-    return errorResponse(res, 201, "User not found!");
+    return errorResponse(res, 404, "User not found!");
   }
 };
 
@@ -163,13 +158,13 @@ module.exports.logout = async (req, res) => {
   try {
     if (user) {
       // await client.del(user._id.toString());
-      return successResponse(res, [], 200, "Logout success");
+      return successResponse(res, "", 200, "Logout success");
     }
   } catch (err) {
     return errorResponse(res, 401, err);
   }
 
-  return errorResponse(res, 500, "Authentication failed. User not found.");
+  return errorResponse(res, 401, "Authentication failed. User not found.");
 };
 
 module.exports.checkToken = async (req, res) => {
@@ -184,18 +179,18 @@ module.exports.checkToken = async (req, res) => {
     } catch (err) {
       var decoded = jwt.decode(token);
       if (decoded && Date.now() >= decoded.exp * 1000) {
-        return res.status(200).send({
+        return res.status(401).send({
           result: false,
           message: "token is expired",
         });
       }
-      return res.status(200).send({
+      return res.status(401).send({
         result: false,
         message: "token error verify",
       });
     }
   }
-  return res.status(200).send({
+  return res.status(401).send({
     result: false,
     message: "token is required",
   });

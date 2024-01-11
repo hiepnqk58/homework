@@ -1,0 +1,4 @@
+[2024-01-09 22:26:38] error: [middlewares:error.middleware] Error: password must be at least 6 characters - 
+
+[2024-01-09 22:26:46] error: [middlewares:error.middleware] Error: password must contain at least 1 letter and 1 number - 
+

@@ -27,11 +27,11 @@ const toJSON = (schema) => {
       });
 
       ret.id = ret._id.toString();
-      ret.created_at = 121; // moment(ret.created_at).format("YYYY-MM-DD HH:mm:ss");
+      ret.created_at = moment(ret.created_at).format("YYYY-MM-DD HH:mm:ss");
       ret.updated_at = moment(ret.updated_at).format("YYYY-MM-DD HH:mm:ss");
       delete ret._id;
       delete ret.__v;
-
+      delete ret.password_hash;
       if (transform) {
         return transform(doc, ret, options);
       }

@@ -9,9 +9,9 @@ const {
 } = require("../../../middlewares/role.middleware");
 
 router.get("/all", [authenticate, roleUser], dbController.getAll);
-router.post("/detail", [authenticate, roleUser], dbController.getDetail);
-router.post("/paginate", [authenticate, roleUser], dbController.getAllPaginate);
 router.get("/detail", [authenticate, roleUser], dbController.getDetail);
+router.post("/add", [authenticate, roleUser], dbController.add);
+router.post("/edit", [authenticate, roleUser], dbController.edit);
 router.post("/delete", [authenticate, roleSuperAdmin], dbController.delete);
 router.post("/insert", dbController.insert);
 router.get("/search", [authenticate, roleUser], dbController.search);

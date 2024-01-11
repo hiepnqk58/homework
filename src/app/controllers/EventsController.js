@@ -82,7 +82,6 @@ module.exports.getAllPaginate = async (req, res) => {
   let endDate = req.query.end_date;
   let conditions = [{}];
   let conditionFilter;
-
   if (startDate && endDate) {
     conditions = [
       { updated_at: { $lte: new Date(endDate) } },
@@ -94,16 +93,25 @@ module.exports.getAllPaginate = async (req, res) => {
     conditionFilter = parseCondition(filter);
   }
   conditionFilter = conditionFilter ? conditionFilter : { $and: [{}] };
-
   let query = [
     {
       $match: { $and: [{ $and: conditions }, { $or: conditionCheck }] },
     },
     {
+      $addFields: {
+        id: "$_id", // Add a new field 'id' with the value of '_id'
+        created_at: {
+          $dateToString: { format: "%Y-%m-%d %H:%M:%S", date: "$created_at" },
+        },
+        updated_at: {
+          $dateToString: { format: "%Y-%m-%d %H:%M:%S", date: "$updated_at" },
+        },
+      },
+    },
+    {
       $project: {
         _id: 0,
         __v: 0,
-        created_at: 0,
         is_deleted: 0,
       },
     },
@@ -145,7 +153,7 @@ module.exports.getDetail = async (req, res) => {
     let id = req.query.id;
     if (id) {
       let data = await eventModel.findById(id);
-      return successResponse(res, [data], 200, "Success");
+      return successResponse(res, data, 200, "Success");
     }
     return errorResponse(res, 404, "Event not found.");
   } catch (e) {
@@ -166,29 +174,12 @@ module.exports.search = async (req, res) => {
     let index = req.query.skip || 0;
     let startDate = req.query.start_date;
     let endDate = req.query.end_date;
-    let unitCode = req.query.unit_code;
     let filter = req.query.filter;
     let conditions = [{}];
     if (startDate && endDate) {
       conditions = [
         { updated_at: { $lte: new Date(endDate) } },
         { updated_at: { $gte: new Date(startDate) } },
-      ];
-    }
-    if (unitCode !== "all") {
-      conditions = [
-        ...conditions,
-        {
-          $or: [
-            {
-              $and: [
-                { ident_info: { $ne: null } },
-                { "ident_info.idParent.unit_code": unitCode },
-              ],
-            },
-            { unit_code: unitCode },
-          ],
-        },
       ];
     }
 
@@ -207,13 +198,13 @@ module.exports.search = async (req, res) => {
           },
         },
         {
-          alert_type: {
+          event_type: {
             $regex: ".*" + filter + ".*",
             $options: "i",
           },
         },
         {
-          alert_level_id: {
+          event_info: {
             $regex: ".*" + filter + ".*",
             $options: "i",
           },
@@ -255,9 +246,14 @@ module.exports.search = async (req, res) => {
       .skip(index)
       .limit(limit)
       .lean();
-    return successResponse(res, { event: data, totalCount }, 200, "Success");
+    return successResponse(
+      res,
+      { data, totalCount },
+      200,
+      " Event search Success"
+    );
   } catch (error) {
-    return errorResponse(res, 500, "Course search error");
+    return errorResponse(res, 500, "Event search error");
   }
 };
 
@@ -317,21 +313,16 @@ module.exports.insert = async (req, res) => {
     let arrEvent = req.body;
     if (Array.isArray(arrEvent) && arrEvent.length > 0) {
       for (let index in arrEvent) {
-        const event = arrEvent[index];
-        const checkEvent = await eventModel.checkExistingField("name", db.name);
-
-        if (checkEvent) {
-          const option = { new: true, upsert: true };
-          let query = { mac: event.mac };
-          await eventModel.findOneAndUpdate(query, db, option);
-          return successResponse(res, "", 200, "Event exists");
-        }
+        let event = arrEvent[index];
+        let timeReceive = moment().format("YYYY-MM-DD HH:mm:ss");
+        event = { ...event, receive_time: timeReceive };
         await eventModel.create(event);
-        return successResponse(res, "", 200, "Event add Success");
       }
+      return successResponse(res, "", 200, "Event insert Success");
     }
-    return errorResponse(res, 500, "Event insert error.");
+    return errorResponse(res, 500, "Event insert not array.");
   } catch (error) {
+    console.log(error);
     return errorResponse(res, 500, "Event insert error.");
   }
 };

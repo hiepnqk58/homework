@@ -4,11 +4,11 @@ const { toJSON, paginate } = require("./plugins");
 const moment = require("moment");
 var dbSchema = new Schema(
   {
-    name: { type: String, unique: true },
+    name: { type: String },
     type: { type: String },
     description: { type: String },
-    condition: { type: Object }, 
-    is_deleted: { type: Boolean, default: false },    
+    condition: { type: Object },
+    is_deleted: { type: Boolean, default: false },
   },
   {
     minimize: false,
@@ -49,7 +49,7 @@ dbSchema.plugin(toJSON);
 dbSchema.plugin(paginate);
 
 dbSchema.statics.checkExistingField = async (field, value) => {
-  const checkField = await c2ServersModel.findOne({ [`${field}`]: value });
+  const checkField = await dbModel.findOne({ [`${field}`]: value });
 
   return checkField;
 };

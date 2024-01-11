@@ -1,6 +1,7 @@
 const config = require("../../configs/app");
 const userModel = require("../models/User");
 const { successResponse, errorResponse } = require("../../helper/responseJson");
+const bcrypt = require("bcryptjs/dist/bcrypt");
 
 module.exports.getAllPaginate = async (req, res) => {
   let limit = req.query.take || 12;
@@ -35,7 +36,7 @@ module.exports.getAll = async (req, res) => {
  * @returns
  */
 module.exports.getDetail = async (req, res) => {
-  let userID = req.body.id;
+  let userID = req.query.id;
   if (userID) {
     let data = await userModel.findById(userID);
     return successResponse(res, data, 200, "Success");
@@ -51,13 +52,13 @@ module.exports.getDetail = async (req, res) => {
  */
 module.exports.add = async (req, res) => {
   try {
-    
-    let conditionRole = JSON.parse(req.body.conditions_role);
-    let condition = JSON.parse(req.body.conditions);
+    // let conditionRole = JSON.parse(req.body.conditions_role);
+    let condition = JSON.parse(req.body.condition);
     let newUser = {
       ...req.body,
-      conditions_role: conditionRole,
-      conditions:condition
+      password_hash: await bcrypt.hash("Abcd@1234", 10),
+      // conditions_role: conditionRole,
+      conditions: condition,
     };
     const checkUserName = await userModel.checkExistingField(
       "username",
@@ -84,15 +85,22 @@ module.exports.edit = async (req, res) => {
   let userID = req.body.id;
   try {
     let user = await userModel.findById(userID).lean();
-    let conditionRole = JSON.parse(req.body.conditions_role);
+    // let conditionRole = JSON.parse(req.body.conditions_role);
     if (user) {
       let editUser = {
         username: req.body.username,
         full_name: req.body.full_name,
         role: req.body.role,
-        conditions: req.body.conditions,
-        conditions_role: conditionRole,
+        conditions: req.body.condition,
+        // conditions_role: conditionRole,
       };
+      const checkUserName = await userModel.checkExistingField(
+        "username",
+        req.body.username
+      );
+      if (checkUserName) {
+        return errorResponse(res, 409, "User already exist");
+      }
       const userUpdate = await userModel.findOneAndUpdate(
         { _id: userID },
         editUser,

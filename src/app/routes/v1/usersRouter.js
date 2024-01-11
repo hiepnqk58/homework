@@ -12,7 +12,7 @@ router.get(
   [authenticate, apiLimiter, roleSuperAdmin],
   usersController.getAll
 );
-router.post(
+router.get(
   "/detail",
   [authenticate, apiLimiter, roleSuperAdmin],
   usersController.getDetail

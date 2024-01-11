@@ -10,11 +10,11 @@ const authRoute = require("./authRouter");
 
 const router = express.Router();
 
-const defaultRoutes = [    
+const defaultRoutes = [
   {
     path: "/users",
     route: userRoute,
-  },  
+  },
   {
     path: "/agents",
     route: agentRoute,
@@ -22,15 +22,15 @@ const defaultRoutes = [
   {
     path: "/events",
     route: eventRoute,
-  }, 
+  },
   {
     path: "/auth",
     route: authRoute,
   },
   {
-    path: "/db",
+    path: "/dbs",
     route: dbRoute,
-  }, 
+  },
   // {
   //   path: "/settings",
   //   route: settingRoute,

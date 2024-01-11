@@ -31,7 +31,7 @@ const successResponse = async (res, data, code, message) => {
 };
 
 const errorResponse = async (res, code, message) => {
-  return res.status(200).json({
+  return res.status(code).json({
     code: code || 400,
     message: message || "error",
   });

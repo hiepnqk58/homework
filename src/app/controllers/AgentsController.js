@@ -2,6 +2,7 @@ const agentsModel = require("../models/Agents");
 const { successResponse, errorResponse } = require("../../helper/responseJson");
 const md5 = require("md5");
 const readXlsxFile = require("read-excel-file/node");
+const moment = require("moment");
 const common = require("../../helper/common");
 const { getUserCurrent } = require("../../helper/authTokenJWT");
 module.exports.getAll = async (req, res) => {
@@ -84,6 +85,24 @@ module.exports.getAllPaginate = async (req, res) => {
       $match: { $or: conditionCheck },
     },
     {
+      $addFields: {
+        id: "$_id", // Add a new field 'id' with the value of '_id'
+        created_at: {
+          $dateToString: { format: "%Y-%m-%d %H:%M:%S", date: "$created_at" },
+        },
+        updated_at: {
+          $dateToString: { format: "%Y-%m-%d %H:%M:%S", date: "$updated_at" },
+        },
+      },
+    },
+    {
+      $project: {
+        _id: 0, // Exclude the original '_id' field
+        __v: 0, // Exclude the '__v' field if it exists
+        is_deleted: 0,
+      },
+    },
+    {
       $match: conditionFilter,
     },
     //{ $sort: { created_at: -1 } },
@@ -102,7 +121,7 @@ module.exports.getAllPaginate = async (req, res) => {
         ])
       : null,
   ]);
-
+  console.log(totalCountResult);
   const totalCount =
     totalCountResult && totalCountResult.length > 0
       ? totalCountResult[0].total
@@ -127,7 +146,7 @@ module.exports.add = async (req, res) => {
   try {
     let agent = { ...req.body };
     let agentNew = await agentsModel.create([agent]);
-    return successResponse(res, [agentNew], 200, "Agent add Success");
+    return successResponse(res, agentNew, 200, "Agent add Success");
   } catch (error) {
     return errorResponse(res, 500, "Agent add error");
   }
@@ -136,7 +155,8 @@ module.exports.add = async (req, res) => {
 module.exports.edit = async (req, res) => {
   try {
     let agent = req.body;
-    let agentExists = await agentsModel.checkExistingField("mac", agent.mac);
+    console.log(agent.id);
+    let agentExists = await agentsModel.checkExistingField("_id", agent.id);
     const option = { new: true, upsert: true };
     const query = { mac: agent.mac };
     const update = { ...agent };
@@ -179,23 +199,121 @@ module.exports.insert = async (req, res) => {
     if (Array.isArray(arrAgent) && arrAgent.length > 0) {
       for (let index in arrAgent) {
         let agent = arrAgent[index];
+        let timeReceive = moment().format("YYYY-MM-DD HH:mm:ss");
+        agent = { ...agent, last_seen: timeReceive };
         let agentExists = await agentsModel.checkExistingField(
           "mac",
           agent.mac
         );
         if (agentExists) {
-          await agentsModel.findByIdAndUpdate(
-            id,
-            { is_deleted: true },
-            { new: true, upsert: true }
-          );
+          const option = { new: true, upsert: true };
+          let query = { mac: agent.mac };
+          await agentsModel.findOneAndUpdate(query, agent, option);
+        } else {
+          await agentsModel.create(agent);
         }
-        await agentsModel.findOneAndUpdate(query, update, option);
       }
+      return successResponse(res, "", 200, "Agent insert Success");
     }
-    return successResponse(res, "", 200, "Agent insert success");
+    return successResponse(res, "", 500, "Agent not array");
   } catch (error) {
     console.log(error);
     return errorResponse(res, 500, "Agent insert error");
+  }
+};
+
+/**
+ * Tìm kiếm Agents
+ * @param {*} req
+ * @param {*} res
+ * @returns
+ */
+module.exports.search = async (req, res) => {
+  try {
+    let queryValueSearch = [];
+    let limit = req.query.take || 12;
+    let index = req.query.skip || 0;
+    let startDate = req.query.start_date;
+    let endDate = req.query.end_date;
+    let filter = req.query.filter;
+    let conditions = [{}];
+    if (startDate && endDate) {
+      conditions = [
+        { updated_at: { $lte: new Date(endDate) } },
+        { updated_at: { $gte: new Date(startDate) } },
+      ];
+    }
+
+    if (filter) {
+      queryValueSearch = [
+        {
+          mac: {
+            $regex: ".*" + filter + ".*",
+            $options: "i",
+          },
+        },
+        {
+          local_ip: {
+            $regex: ".*" + filter + ".*",
+            $options: "i",
+          },
+        },
+        {
+          computer_name: {
+            $regex: ".*" + filter + ".*",
+            $options: "i",
+          },
+        },
+        {
+          public_ip: {
+            $regex: ".*" + filter + ".*",
+            $options: "i",
+          },
+        },
+        {
+          last_seen: {
+            $regex: ".*" + filter + ".*",
+            $options: "i",
+          },
+        },
+      ];
+    }
+    conditions =
+      queryValueSearch.length > 0
+        ? {
+            $and: [
+              {
+                $or: queryValueSearch,
+              },
+              {
+                $and: conditions,
+              },
+            ],
+          }
+        : {
+            $and: [
+              {
+                $and: conditions,
+              },
+            ],
+          };
+    let totalCount = req.query.requireTotalCount
+      ? await eventModel.find(conditions).count()
+      : 0;
+
+    let data = await agentsModel
+      .find(conditions)
+      .sort({ created_at: -1 })
+      .skip(index)
+      .limit(limit)
+      .lean();
+    return successResponse(
+      res,
+      { data, totalCount },
+      200,
+      " Event search Success"
+    );
+  } catch (error) {
+    return errorResponse(res, 500, "Event search error");
   }
 };

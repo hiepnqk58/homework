@@ -70,24 +70,6 @@ module.exports.getDetail = async (req, res) => {
   }
 };
 
-module.exports.delete = async (req, res) => {
-  try {
-    let id = req.body.id;
-    let db = await dbModel.findById(id);
-    if (db) {
-      await dbModel.findByIdAndUpdate(
-        id,
-        { is_deleted: true },
-        { new: true, upsert: true }
-      );
-      return successResponse(res, "", 200, "Db delete success");
-    }
-    return errorResponse(res, 404, "Db not found.");
-  } catch (error) {
-    return errorResponse(res, 500, "Db delete error");
-  }
-};
-
 module.exports.auditDB = async (req, res) => {
   try {
     let arrDB = req.body;
@@ -299,9 +281,14 @@ module.exports.getAllPaginate = async (req, res) => {
 module.exports.add = async (req, res) => {
   try {
     let db = { ...req.body };
+    let dbExists = await dbModel.checkExistingField("name", db.name);
+    if (dbExists) {
+      return successResponse(res, "", 200, "Db exists");
+    }
     let dbNew = await dbModel.create([db]);
-    return successResponse(res, [dbNew], 200, "Db add Success");
+    return successResponse(res, dbNew, 200, "Db add Success");
   } catch (error) {
+    console.log(error);
     return errorResponse(res, 500, "Db add error");
   }
 };
@@ -309,7 +296,7 @@ module.exports.add = async (req, res) => {
 module.exports.edit = async (req, res) => {
   try {
     let db = req.body;
-    let dbExists = await dbModel.checkExistingField("name", agent.name);
+    let dbExists = await dbModel.checkExistingField("name", db.name);
     const option = { new: true, upsert: true };
     const query = { name: db.name };
     const update = { ...db };
@@ -319,6 +306,7 @@ module.exports.edit = async (req, res) => {
     }
     return successResponse(res, {}, 200, "Db not found");
   } catch (error) {
+    console.log(error);
     return errorResponse(res, 500, "Db edit error.");
   }
 };

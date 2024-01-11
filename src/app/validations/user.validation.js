@@ -6,7 +6,7 @@ const addSchema = {
   body: Joi.object()
     .keys({
       username: Joi.string().required(),
-      password: Joi.string().required().custom(password),
+      // password: Joi.string().required().custom(password),
       role: Joi.string().required(),
       full_name: Joi.string().allow(""),
     })
@@ -17,7 +17,7 @@ const editSchema = {
   body: Joi.object()
     .keys({
       username: Joi.string().required(),
-      password: Joi.string().required().custom(password),
+      // password: Joi.string().required().custom(password),
       role: Joi.string().required(),
       full_name: Joi.string().allow(""),
     })

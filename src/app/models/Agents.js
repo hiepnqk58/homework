@@ -17,8 +17,8 @@ var agentsSchema = new Schema(
     local_time: { type: String },
     agent_version: { type: String },
     agent_user: { type: String },
-    last_seen: { type: Array },   
-    is_deleted: { type: Boolean, default: false },    
+    last_seen: { type: Array },
+    is_deleted: { type: Boolean, default: false },
   },
   {
     minimize: false,
@@ -37,19 +37,16 @@ agentsSchema.pre(["find", "findOne"], function (next) {
   next();
 });
 
-agentsSchema.post(
-  ["find", "findOne", "findOneAndUpdate"],
-  function (res) {
-    if (!res || !this.mongooseOptions().lean) {
-      return;
-    }
-    if (Array.isArray(res)) {
-      res.forEach(transformDoc);
-      return;
-    }
-    transformDoc(res);
+agentsSchema.post(["find", "findOne", "findOneAndUpdate"], function (res) {
+  if (!res || !this.mongooseOptions().lean) {
+    return;
   }
-);
+  if (Array.isArray(res)) {
+    res.forEach(transformDoc);
+    return;
+  }
+  transformDoc(res);
+});
 
 function transformDoc(doc) {
   doc.id = doc._id;
@@ -92,9 +89,5 @@ agentsSchema.post("remove", function (result) {
   console.log("Document deleted: ", result);
 });
 
-var agentsModel = mongoose.model(
-  "agents",
-  agentsSchema,
-  "agents"
-);
+var agentsModel = mongoose.model("agents", agentsSchema, "agents");
 module.exports = agentsModel;

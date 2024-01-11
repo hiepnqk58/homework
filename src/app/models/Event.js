@@ -14,7 +14,7 @@ var eventsSchema = new Schema(
     name_fmc: { type: String },
     unit_name: { type: String },
     event_info: { type: String },
-    receive_time: { type: Array },  
+    receive_time: { type: Array },
   },
   {
     minimize: false,
@@ -24,10 +24,10 @@ var eventsSchema = new Schema(
     },
   }
 );
-eventsSchema.index({updated_at:1})
-eventsSchema.index({"idParent.unit_code":1})
-eventsSchema.index({auto_increment:1})
-eventsSchema.index({time_receive:1})
+eventsSchema.index({ updated_at: 1 });
+eventsSchema.index({ "idParent.unit_code": 1 });
+eventsSchema.index({ auto_increment: 1 });
+eventsSchema.index({ time_receive: 1 });
 eventsSchema.pre(["find", "findOne"], function (next) {
   // Add soft delete condition to the query
   this.where({

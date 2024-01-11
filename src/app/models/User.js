@@ -10,7 +10,7 @@ var usersSchema = new Schema(
     display_name: { type: String },
     username: { type: String },
     password_hash: { type: String },
-    condition: { type: Object },    
+    condition: { type: Object },
     role: { type: String },
     is_deleted: { type: Boolean, default: false },
     deleted_by: { type: String },
@@ -84,7 +84,6 @@ usersSchema.statics.checkExistingField = async (field, value) => {
 
 usersSchema.methods.comparePassword = async function (password) {
   try {
-    console.log(password)
     return await bcrypt.compare(password, this.password_hash);
   } catch (error) {
     return false;

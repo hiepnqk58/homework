@@ -1,0 +1,88 @@
+{
+	"info": {
+		"_postman_id": "c7aa5bc1-cf9e-47e6-b415-8a576cde0303",
+		"name": "BigHomeWork",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "1611784",
+		"_collection_link": "https://interstellar-meadow-347752.postman.co/workspace/TeamWork~6f9922df-bcdb-4903-a8ff-00c2dba398d8/collection/1611784-c7aa5bc1-cf9e-47e6-b415-8a576cde0303?action=share&source=collection_link&creator=1611784"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\": \"admin\",\r\n    \"password\": \"Abcd@1234\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{host}}/api/v1/auth/login",
+							"protocol": "https",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "register",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\": \"admin12321338\",\r\n    \"password\": \"Abcd@1234\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{pro}}/api/v1/auth/register",
+							"protocol": "https",
+							"host": [
+								"{{pro}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "DB",
+			"item": []
+		},
+		{
+			"name": "Event",
+			"item": []
+		},
+		{
+			"name": "User",
+			"item": []
+		}
+	]
+}
