@@ -2,18 +2,21 @@ const jwt = require("jsonwebtoken");
 const fs = require("fs");
 const path = require("path");
 const mongoose = require("mongoose");
-const config = require("../../configs/app");
-const settingModel = require("../models/Setting");
-const activeDeviceModel = require("../models/ActiveDevice");
-const alertModel = require("../models/Alert");
-const c2ServerModel = require("../models/C2Server");
-const eventModel = require("../models/Event");
-const identDeviceModel = require("../models/IdentDevice");
-const softwareManagerModel = require("../models/SoftwareManager");
-const unitModel = require("../models/Unit");
-const userModel = require("../models/User");
-const { successResponse, errorResponse } = require("../../helper/responseJson");
-const common = require("../../helper/common");
+const config = require("./../../configs/app");
+const settingModel = require("./../models/Setting");
+const activeDeviceModel = require("./../models/ActiveDevice");
+const alertModel = require("./../models/Alert");
+const c2ServerModel = require("./../models/C2Server");
+const eventModel = require("./../models/Event");
+const identDeviceModel = require("./../models/IdentDevice");
+const softwareManagerModel = require("./../models/SoftwareManager");
+const unitModel = require("./../models/Unit");
+const userModel = require("./../models/User");
+const {
+  successResponse,
+  errorResponse,
+} = require("./../../helper/responseJson");
+const common = require("./../../helper/common");
 /**
  * Lấy thông tin cấu hình.
  * @param {*} req

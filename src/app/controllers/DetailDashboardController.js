@@ -1,16 +1,19 @@
-const alertModel = require("../models/Alert");
-const activeDeviceModel = require("../models/ActiveDevice");
-const { successResponse, errorResponse } = require("../../helper/responseJson");
-const common = require("../../helper/common");
-const settingModel = require("../models/Setting");
-const unitModel = require("../models/Unit");
-const { getUserCurrent } = require("../../helper/authTokenJWT");
+const alertModel = require("./../models/Alert");
+const activeDeviceModel = require("./../models/ActiveDevice");
+const {
+  successResponse,
+  errorResponse,
+} = require("./../../helper/responseJson");
+const common = require("./../../helper/common");
+const settingModel = require("./../models/Setting");
+const unitModel = require("./../models/Unit");
+const { getUserCurrent } = require("./../../helper/authTokenJWT");
 let conditionCheck = [
   { is_deleted: { $exists: false } },
   { is_deleted: false },
 ];
 
-function parseCondition (filter)  {
+function parseCondition(filter) {
   if (filter[0] == "!") {
     let sub_filter = parseCondition(filter[1]);
     return { $nor: [sub_filter] };
@@ -20,29 +23,31 @@ function parseCondition (filter)  {
     current_filter[filter[0]] = filter[2];
     return current_filter;
   }
-   if (filter[1] == "contains") {
+  if (filter[1] == "contains") {
     let current_filter = {};
-    current_filter[filter[0]] = {$regex: new RegExp(filter[2], "i")};
+    current_filter[filter[0]] = { $regex: new RegExp(filter[2], "i") };
     return current_filter;
   }
-   if (filter[1] == "notcontains") {
+  if (filter[1] == "notcontains") {
     let current_filter = {};
-    current_filter[filter[0]] = {$not: { $regex: new RegExp(filter[2], "i") }};
+    current_filter[filter[0]] = {
+      $not: { $regex: new RegExp(filter[2], "i") },
+    };
     return current_filter;
   }
-   if (filter[1] == "startswith") {
+  if (filter[1] == "startswith") {
     let current_filter = {};
-    current_filter[filter[0]] = { $regex: new RegExp(`^${filter[2]}`, "i")};
+    current_filter[filter[0]] = { $regex: new RegExp(`^${filter[2]}`, "i") };
     return current_filter;
   }
-   if (filter[1] == "endswith") {
+  if (filter[1] == "endswith") {
     let current_filter = {};
-    current_filter[filter[0]] = { $regex: new RegExp(`${filter[2]}$`, "i")};
+    current_filter[filter[0]] = { $regex: new RegExp(`${filter[2]}$`, "i") };
     return current_filter;
   }
-    if (filter[1] == "<>") {
+  if (filter[1] == "<>") {
     let current_filter = {};
-    current_filter[filter[0]] = { $ne: filter[2]};
+    current_filter[filter[0]] = { $ne: filter[2] };
     return current_filter;
   }
   if (filter[1] == "and") {
@@ -67,7 +72,7 @@ function parseCondition (filter)  {
 //Chi tiet thiet bi vi pham quy dinh
 module.exports.detailViolent = async (req, res) => {
   let authUser = req.authUser;
-  let conditionsUser = authUser.conditions_role
+  let conditionsUser = authUser.conditions_role;
   let setting = await settingModel.findOne().sort({ updated_at: 1 }).lean();
   let unitCodeSetting = setting.unit_code;
   let unit = await unitModel.findOne({ unit_code: unitCodeSetting });
@@ -87,35 +92,36 @@ module.exports.detailViolent = async (req, res) => {
     ];
   }
   if (unitCode !== "all") {
-    conditions = [
-      ...conditions,
-      { "idParent.unit_code": unitCode },
-    ];
+    conditions = [...conditions, { "idParent.unit_code": unitCode }];
   }
   if (filter) {
     filter = JSON.parse(filter);
-    conditionFilter = parseCondition(filter);   
+    conditionFilter = parseCondition(filter);
   }
   conditionFilter = conditionFilter ? conditionFilter : { $and: [{}] };
 
   let query = [
     {
-      $match: {$and:[{$and: conditions},{ $or: conditionCheck },{
-        $or: [
-          { alert_type: {$regex:"Internet.*",$options:"$i"} },
+      $match: {
+        $and: [
+          { $and: conditions },
+          { $or: conditionCheck },
           {
-            $and: [
-              { alert_type: {$regex:"USB.*",$options:"$i"} },
-              { "alert_info.diskinfo": { $regex: "(Khong an toan).*" } },
+            $or: [
+              { alert_type: { $regex: "Internet.*", $options: "$i" } },
+              {
+                $and: [
+                  { alert_type: { $regex: "USB.*", $options: "$i" } },
+                  { "alert_info.diskinfo": { $regex: "(Khong an toan).*" } },
+                ],
+              },
             ],
           },
         ],
-      }
-]  },
-    },    
+      },
+    },
     {
-      $match : 
-        conditionsUser   
+      $match: conditionsUser,
     },
     {
       $addFields: {
@@ -134,11 +140,11 @@ module.exports.detailViolent = async (req, res) => {
         __v: 0,
         created_at: 0,
         updated_at: 0,
-        auto_increment:0,
-        idParent:0,
-        ident_info:0,
+        auto_increment: 0,
+        idParent: 0,
+        ident_info: 0,
         is_deleted: 0,
-        time_send:0
+        time_send: 0,
       },
     },
     {
@@ -150,27 +156,27 @@ module.exports.detailViolent = async (req, res) => {
   ];
   const [alert, totalCountResult] = await Promise.all([
     await alertModel.aggregate(query),
-      req.query.requireTotalCount
-        ? alertModel.aggregate([
-            ...query.slice(0, -3), // Loại bỏ $limit và $skip từ truy vấn tính totalCount
-            {
-              $count: "total",
-            },
-          ])
-        : null,
-    ]);
-  
-    const totalCount =
-      totalCountResult && totalCountResult.length > 0
-        ? totalCountResult[0].total
-        : 0;
+    req.query.requireTotalCount
+      ? alertModel.aggregate([
+          ...query.slice(0, -3), // Loại bỏ $limit và $skip từ truy vấn tính totalCount
+          {
+            $count: "total",
+          },
+        ])
+      : null,
+  ]);
+
+  const totalCount =
+    totalCountResult && totalCountResult.length > 0
+      ? totalCountResult[0].total
+      : 0;
   return successResponse(res, { totalCount, alert }, 200, "Success");
 };
 
 //Chi tiet thiet bi ket noi C&C
 module.exports.detailCandC = async (req, res) => {
   let authUser = req.authUser;
-  let conditionsUser = authUser.conditions_role
+  let conditionsUser = authUser.conditions_role;
   let setting = await settingModel.findOne().sort({ updated_at: 1 }).lean();
   let unitCodeSetting = setting.unit_code;
   let unit = await unitModel.findOne({ unit_code: unitCodeSetting });
@@ -183,7 +189,6 @@ module.exports.detailCandC = async (req, res) => {
   let endDate = req.query.end_date;
   let conditions = [{}];
   let conditionFilter;
- 
 
   if (startDate && endDate) {
     conditions = [
@@ -192,27 +197,31 @@ module.exports.detailCandC = async (req, res) => {
     ];
   }
   if (unitCode !== "all") {
-    conditions = [
-      ...conditions,
-      { "idParent.unit_code": unitCode },
-    ];
+    conditions = [...conditions, { "idParent.unit_code": unitCode }];
   }
   if (filter) {
     filter = JSON.parse(filter);
-    conditionFilter = parseCondition(filter);   
+    conditionFilter = parseCondition(filter);
   }
   conditionFilter = conditionFilter ? conditionFilter : { $and: [{}] };
 
   let query = [
     {
-      $match: {$and:[{$and: conditions},{ $or: conditionCheck },{
-        $or: [{ alert_type: {$regex:"Black_domain.*",$options:"$i"} }, { alert_type: {$regex:"Black_ip.*",$options:"$i"} },],
+      $match: {
+        $and: [
+          { $and: conditions },
+          { $or: conditionCheck },
+          {
+            $or: [
+              { alert_type: { $regex: "Black_domain.*", $options: "$i" } },
+              { alert_type: { $regex: "Black_ip.*", $options: "$i" } },
+            ],
+          },
+        ],
       },
-]  },
-    },   
+    },
     {
-      $match : 
-        conditionsUser   
+      $match: conditionsUser,
     },
     {
       $addFields: {
@@ -225,18 +234,18 @@ module.exports.detailCandC = async (req, res) => {
         },
       },
     },
-    
+
     {
       $project: {
         _id: 0,
         __v: 0,
         created_at: 0,
         updated_at: 0,
-        auto_increment:0,
-        idParent:0,
-        ident_info:0,
+        auto_increment: 0,
+        idParent: 0,
+        ident_info: 0,
         is_deleted: 0,
-        time_send:0
+        time_send: 0,
       },
     },
     {
@@ -248,27 +257,27 @@ module.exports.detailCandC = async (req, res) => {
   ];
   const [alert, totalCountResult] = await Promise.all([
     await alertModel.aggregate(query),
-      req.query.requireTotalCount
-        ? alertModel.aggregate([
-            ...query.slice(0, -3), // Loại bỏ $limit và $skip từ truy vấn tính totalCount
-            {
-              $count: "total",
-            },
-          ])
-        : null,
-    ]);
-  
-    const totalCount =
-      totalCountResult && totalCountResult.length > 0
-        ? totalCountResult[0].total
-        : 0;
+    req.query.requireTotalCount
+      ? alertModel.aggregate([
+          ...query.slice(0, -3), // Loại bỏ $limit và $skip từ truy vấn tính totalCount
+          {
+            $count: "total",
+          },
+        ])
+      : null,
+  ]);
+
+  const totalCount =
+    totalCountResult && totalCountResult.length > 0
+      ? totalCountResult[0].total
+      : 0;
   return successResponse(res, { totalCount, alert }, 200, "Success");
 };
 
 //Chi tiet canh bao ma doc
 module.exports.detailMalware = async (req, res) => {
   let authUser = req.authUser;
-  let conditionsUser = authUser.conditions_role
+  let conditionsUser = authUser.conditions_role;
   let setting = await settingModel.findOne().sort({ updated_at: 1 }).lean();
   let unitCodeSetting = setting.unit_code;
   let unit = await unitModel.findOne({ unit_code: unitCodeSetting });
@@ -280,7 +289,7 @@ module.exports.detailMalware = async (req, res) => {
   let startDate = req.query.start_date;
   let endDate = req.query.end_date;
   let conditions = [{}];
-  let conditionFilter; 
+  let conditionFilter;
   if (startDate && endDate) {
     conditions = [
       { updated_at: { $lte: new Date(endDate) } },
@@ -288,26 +297,27 @@ module.exports.detailMalware = async (req, res) => {
     ];
   }
   if (unitCode !== "all") {
-    conditions = [
-      ...conditions,
-      { "idParent.unit_code": unitCode },
-    ];
+    conditions = [...conditions, { "idParent.unit_code": unitCode }];
   }
   if (filter) {
     filter = JSON.parse(filter);
-    conditionFilter = parseCondition(filter);  
+    conditionFilter = parseCondition(filter);
   }
   conditionFilter = conditionFilter ? conditionFilter : { $and: [{}] };
 
   let query = [
     {
-      $match: {$and:[{$and: conditions},{ $or: conditionCheck },{ alert_type: {$regex:"Malware.*",$options:"$i"} },
-      { $or: [{ alert_level_id: "3" }, { alert_level_id: "2" }]}
-]  },
-    },   
+      $match: {
+        $and: [
+          { $and: conditions },
+          { $or: conditionCheck },
+          { alert_type: { $regex: "Malware.*", $options: "$i" } },
+          { $or: [{ alert_level_id: "3" }, { alert_level_id: "2" }] },
+        ],
+      },
+    },
     {
-      $match : 
-        conditionsUser   
+      $match: conditionsUser,
     },
     {
       $addFields: {
@@ -319,18 +329,18 @@ module.exports.detailMalware = async (req, res) => {
           },
         },
       },
-    },   
+    },
     {
       $project: {
         _id: 0,
         __v: 0,
         created_at: 0,
         updated_at: 0,
-        auto_increment:0,
-        idParent:0,
-        ident_info:0,
+        auto_increment: 0,
+        idParent: 0,
+        ident_info: 0,
         is_deleted: 0,
-        time_send:0
+        time_send: 0,
       },
     },
     {
@@ -342,20 +352,19 @@ module.exports.detailMalware = async (req, res) => {
   ];
   const [alert, totalCountResult] = await Promise.all([
     await alertModel.aggregate(query),
-      req.query.requireTotalCount
-        ? alertModel.aggregate([
-            ...query.slice(0, -3), // Loại bỏ $limit và $skip từ truy vấn tính totalCount
-            {
-              $count: "total",
-            },
-          ])
-        : null,
-    ]);
-  
-    const totalCount =
-      totalCountResult && totalCountResult.length > 0
-        ? totalCountResult[0].total
-        : 0;
+    req.query.requireTotalCount
+      ? alertModel.aggregate([
+          ...query.slice(0, -3), // Loại bỏ $limit và $skip từ truy vấn tính totalCount
+          {
+            $count: "total",
+          },
+        ])
+      : null,
+  ]);
+
+  const totalCount =
+    totalCountResult && totalCountResult.length > 0
+      ? totalCountResult[0].total
+      : 0;
   return successResponse(res, { totalCount, alert }, 200, "Success");
 };
-

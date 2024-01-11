@@ -1,10 +1,13 @@
-const agentsModel = require("../models/Agents");
-const { successResponse, errorResponse } = require("../../helper/responseJson");
+const agentsModel = require("./../models/Agents");
+const {
+  successResponse,
+  errorResponse,
+} = require("./../../helper/responseJson");
 const md5 = require("md5");
 const readXlsxFile = require("read-excel-file/node");
 const moment = require("moment");
-const common = require("../../helper/common");
-const { getUserCurrent } = require("../../helper/authTokenJWT");
+const common = require("./../../helper/common");
+const { getUserCurrent } = require("./../../helper/authTokenJWT");
 module.exports.getAll = async (req, res) => {
   let identDevices = await agentsModel.find().lean();
   return successResponse(res, identDevices, 200, "Success");

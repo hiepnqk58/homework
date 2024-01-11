@@ -1,4 +1,4 @@
-const dbModel = require("../models/db");
+const dbModel = require("./../models/db");
 const { successResponse, errorResponse } = require("../../helper/responseJson");
 
 module.exports.getAll = async (req, res) => {

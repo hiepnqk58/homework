@@ -1,8 +1,11 @@
 const eventModel = require("../models/Event");
-const { successResponse, errorResponse } = require("../../helper/responseJson");
+const {
+  successResponse,
+  errorResponse,
+} = require("./../../helper/responseJson");
 const moment = require("moment");
-const common = require("../../helper/common");
-const { getUserCurrent } = require("../../helper/authTokenJWT");
+const common = require("./../../helper/common");
+const { getUserCurrent } = require("./../../helper/authTokenJWT");
 let conditionCheck = [
   { is_deleted: { $exists: false } },
   { is_deleted: false },

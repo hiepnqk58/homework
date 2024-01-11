@@ -1,11 +1,14 @@
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
-const config = require("../../configs/app");
+const config = require("./../../configs/app");
 const mongoose = require("mongoose");
-const userModel = require("../models/User");
+const userModel = require("./../models/User");
 const secretKey = process.env.SECRET;
 // const { client } = require("../../helper/connectRedis");
-const { successResponse, errorResponse } = require("../../helper/responseJson");
+const {
+  successResponse,
+  errorResponse,
+} = require("./../../helper/responseJson");
 
 /**
  * Đăng ký tài khoản.

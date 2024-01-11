@@ -1,6 +1,9 @@
-const config = require("../../configs/app");
-const userModel = require("../models/User");
-const { successResponse, errorResponse } = require("../../helper/responseJson");
+const config = require("./../../configs/app");
+const userModel = require("./../models/User");
+const {
+  successResponse,
+  errorResponse,
+} = require("./../../helper/responseJson");
 const bcrypt = require("bcryptjs/dist/bcrypt");
 
 module.exports.getAllPaginate = async (req, res) => {

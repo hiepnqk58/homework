@@ -1,13 +1,19 @@
-const alertModel = require("../models/Alert");
-const identDeviceModel = require("../models/IdentDevice");
-const settingModel = require("../models/Setting");
-const activeDeviceModel = require("../models/ActiveDevice");
-const softwareManagerModel = require("../models/SoftwareManager");
-const unitsModel = require("../models/Unit");
-const { successResponse, errorResponse } = require("../../helper/responseJson");
-const { getUserCurrent } = require("../../helper/authTokenJWT");
+const alertModel = require("./../models/Alert");
+const identDeviceModel = require("./../models/IdentDevice");
+const settingModel = require("./../models/Setting");
+const activeDeviceModel = require("./../models/ActiveDevice");
+const softwareManagerModel = require("./../models/SoftwareManager");
+const unitsModel = require("./../models/Unit");
+const {
+  successResponse,
+  errorResponse,
+} = require("./../../helper/responseJson");
+const { getUserCurrent } = require("./../../helper/authTokenJWT");
 
-let conditionCheck = [{ is_deleted: { $exists: false } }, { is_deleted: false }]
+let conditionCheck = [
+  { is_deleted: { $exists: false } },
+  { is_deleted: false },
+];
 
 let typeSoftware = "";
 async function type_Software() {
@@ -22,7 +28,7 @@ checkTypeSoftware();
 //Bieu do thong ke so may nhiem ma doc theo don vi
 module.exports.thongKeNhiemMaDoc = async (req, res) => {
   let authUser = req.authUser;
-  let conditionsUser = authUser.conditions_role
+  let conditionsUser = authUser.conditions_role;
   let unit_code = req.body.unit_code;
   let startDate = req.body.start_date;
   let endDate = req.body.end_date;
@@ -38,14 +44,13 @@ module.exports.thongKeNhiemMaDoc = async (req, res) => {
               { $or: conditionCheck },
               { updated_at: { $gte: new Date(startDate) } },
               { updated_at: { $lte: new Date(endDate) } },
-              { alert_type: {$regex:"Malware.*",$options:"$i"} },
-              {$or:[{alert_level_id:"2"},{alert_level_id:"3"}]}
+              { alert_type: { $regex: "Malware.*", $options: "$i" } },
+              { $or: [{ alert_level_id: "2" }, { alert_level_id: "3" }] },
             ],
           },
         },
         {
-          $match:
-            conditionsUser
+          $match: conditionsUser,
         },
         {
           $addFields: {
@@ -96,14 +101,13 @@ module.exports.thongKeNhiemMaDoc = async (req, res) => {
               { $or: conditionCheck },
               { updated_at: { $gte: new Date(startDate) } },
               { updated_at: { $lte: new Date(endDate) } },
-              { alert_type: {$regex:"Malware.*",$options:"$i"} },
-              {$or:[{alert_level_id:"2"},{alert_level_id:"3"}]}
+              { alert_type: { $regex: "Malware.*", $options: "$i" } },
+              { $or: [{ alert_level_id: "2" }, { alert_level_id: "3" }] },
             ],
           },
         },
         {
-          $match:
-            conditionsUser
+          $match: conditionsUser,
         },
         {
           $addFields: {
@@ -146,7 +150,6 @@ module.exports.thongKeNhiemMaDoc = async (req, res) => {
       let dataAll2 = await alertModel.aggregate(queryAll2);
 
       return successResponse(res, dataAll2, 200, "Success");
-
     }
   }
 
@@ -164,14 +167,13 @@ module.exports.thongKeNhiemMaDoc = async (req, res) => {
               { "idParent.unit_code": unit_code },
               { updated_at: { $gte: new Date(startDate) } },
               { updated_at: { $lte: new Date(endDate) } },
-              { alert_type: {$regex:"Malware.*",$options:"$i"} },
-              {$or:[{alert_level_id:"2"},{alert_level_id:"3"}]}
+              { alert_type: { $regex: "Malware.*", $options: "$i" } },
+              { $or: [{ alert_level_id: "2" }, { alert_level_id: "3" }] },
             ],
           },
         },
         {
-          $match:
-            conditionsUser
+          $match: conditionsUser,
         },
         {
           $addFields: {
@@ -214,7 +216,6 @@ module.exports.thongKeNhiemMaDoc = async (req, res) => {
       let data1 = await alertModel.aggregate(query1);
 
       return successResponse(res, data1, 200, "Success");
-
     }
     if (unit.level == "2") {
       let query2 = [
@@ -225,14 +226,13 @@ module.exports.thongKeNhiemMaDoc = async (req, res) => {
               { "idParent.unit_code": unit_code },
               { updated_at: { $gte: new Date(startDate) } },
               { updated_at: { $lte: new Date(endDate) } },
-              { alert_type: {$regex:"Malware.*",$options:"$i"} },
-              {$or:[{alert_level_id:"2"},{alert_level_id:"3"}]}
+              { alert_type: { $regex: "Malware.*", $options: "$i" } },
+              { $or: [{ alert_level_id: "2" }, { alert_level_id: "3" }] },
             ],
           },
         },
         {
-          $match:
-            conditionsUser
+          $match: conditionsUser,
         },
         {
           $addFields: {
@@ -275,14 +275,13 @@ module.exports.thongKeNhiemMaDoc = async (req, res) => {
       let data2 = await alertModel.aggregate(query2);
 
       return successResponse(res, data2, 200, "Success");
-
     }
   }
 };
 //Bieu do thong ke so may truy van C&C theo don vi
 module.exports.thongKeKetNoiCandC = async (req, res) => {
   let authUser = req.authUser;
-  let conditionsUser = authUser.conditions_role
+  let conditionsUser = authUser.conditions_role;
   let unit_code = req.body.unit_code;
   let startDate = req.body.start_date;
   let endDate = req.body.end_date;
@@ -296,15 +295,19 @@ module.exports.thongKeKetNoiCandC = async (req, res) => {
           $match: {
             $and: [
               { $or: conditionCheck },
-              { updated_at: { $gte: new Date(startDate) }},
+              { updated_at: { $gte: new Date(startDate) } },
               { updated_at: { $lte: new Date(endDate) } },
-              { $or: [{ alert_type: {$regex:"Black_domain.*",$options:"$i"}}, { alert_type: {$regex:"Black_ip.*",$options:"$i"}}] }
-            ]
+              {
+                $or: [
+                  { alert_type: { $regex: "Black_domain.*", $options: "$i" } },
+                  { alert_type: { $regex: "Black_ip.*", $options: "$i" } },
+                ],
+              },
+            ],
           },
         },
         {
-          $match:
-            conditionsUser
+          $match: conditionsUser,
         },
         {
           $addFields: {
@@ -347,7 +350,6 @@ module.exports.thongKeKetNoiCandC = async (req, res) => {
       let dataAll1 = await alertModel.aggregate(queryAll1);
 
       return successResponse(res, dataAll1, 200, "Success");
-
     }
     if (typeSoftware == "FMS3") {
       let queryAll2 = [
@@ -355,15 +357,19 @@ module.exports.thongKeKetNoiCandC = async (req, res) => {
           $match: {
             $and: [
               { $or: conditionCheck },
-              { updated_at: { $gte: new Date(startDate) }, },
+              { updated_at: { $gte: new Date(startDate) } },
               { updated_at: { $lte: new Date(endDate) } },
-              { $or: [{ alert_type: {$regex:"Black_domain.*",$options:"$i"}}, { alert_type: {$regex:"Black_ip.*",$options:"$i"}}] }
-            ]
+              {
+                $or: [
+                  { alert_type: { $regex: "Black_domain.*", $options: "$i" } },
+                  { alert_type: { $regex: "Black_ip.*", $options: "$i" } },
+                ],
+              },
+            ],
           },
         },
         {
-          $match:
-            conditionsUser
+          $match: conditionsUser,
         },
         {
           $addFields: {
@@ -406,7 +412,6 @@ module.exports.thongKeKetNoiCandC = async (req, res) => {
       let dataAll2 = await alertModel.aggregate(queryAll2);
 
       return successResponse(res, dataAll2, 200, "Success");
-
     }
   }
 
@@ -421,16 +426,20 @@ module.exports.thongKeKetNoiCandC = async (req, res) => {
           $match: {
             $and: [
               { "idParent.unit_code": unit_code },
-              { $or: [{ alert_type: {$regex:"Black_domain.*",$options:"$i"}}, { alert_type: {$regex:"Black_ip.*",$options:"$i"}}] },
+              {
+                $or: [
+                  { alert_type: { $regex: "Black_domain.*", $options: "$i" } },
+                  { alert_type: { $regex: "Black_ip.*", $options: "$i" } },
+                ],
+              },
               { $or: conditionCheck },
               { updated_at: { $gte: new Date(startDate) } },
-              { updated_at: { $lte: new Date(endDate) } }
-            ]
+              { updated_at: { $lte: new Date(endDate) } },
+            ],
           },
         },
         {
-          $match:
-            conditionsUser
+          $match: conditionsUser,
         },
         {
           $addFields: {
@@ -473,7 +482,6 @@ module.exports.thongKeKetNoiCandC = async (req, res) => {
       let data1 = await alertModel.aggregate(query1);
 
       return successResponse(res, data1, 200, "Success");
-
     }
     if (unit.level == "2") {
       let query2 = [
@@ -481,16 +489,20 @@ module.exports.thongKeKetNoiCandC = async (req, res) => {
           $match: {
             $and: [
               { "idParent.unit_code": unit_code },
-              { $or: [{ alert_type: {$regex:"Black_domain.*",$options:"$i"}}, { alert_type: {$regex:"Black_ip.*",$options:"$i"}}] },
+              {
+                $or: [
+                  { alert_type: { $regex: "Black_domain.*", $options: "$i" } },
+                  { alert_type: { $regex: "Black_ip.*", $options: "$i" } },
+                ],
+              },
               { $or: conditionCheck },
               { updated_at: { $gte: new Date(startDate) } },
-              { updated_at: { $lte: new Date(endDate) } }
-            ]
+              { updated_at: { $lte: new Date(endDate) } },
+            ],
           },
         },
         {
-          $match:
-            conditionsUser
+          $match: conditionsUser,
         },
         {
           $addFields: {
@@ -533,14 +545,13 @@ module.exports.thongKeKetNoiCandC = async (req, res) => {
       let data2 = await alertModel.aggregate(query2);
 
       return successResponse(res, data2, 200, "Success");
-
     }
   }
 };
 //Bieu do thong ke so may vi pham quy dinh theo don vi
 module.exports.thongKeViolent = async (req, res) => {
   let authUser = req.authUser;
-  let conditionsUser = authUser.conditions_role
+  let conditionsUser = authUser.conditions_role;
   let unit_code = req.body.unit_code;
   let startDate = req.body.start_date;
   let endDate = req.body.end_date;
@@ -561,20 +572,21 @@ module.exports.thongKeViolent = async (req, res) => {
                 $or: [
                   {
                     $and: [
-                      { alert_type: {$regex:"USB.*",$options:"$i"} },
-                      { "alert_info.diskinfo": { $regex: "(Khong an toan).*" } },
+                      { alert_type: { $regex: "USB.*", $options: "$i" } },
+                      {
+                        "alert_info.diskinfo": { $regex: "(Khong an toan).*" },
+                      },
                     ],
                   },
-                  { alert_type: {$regex:"Internet.*",$options:"$i"} },
+                  { alert_type: { $regex: "Internet.*", $options: "$i" } },
                   { alert_type: "Ket noi quan su" },
-                ]
-              }
-            ]
+                ],
+              },
+            ],
           },
         },
         {
-          $match:
-            conditionsUser
+          $match: conditionsUser,
         },
         {
           $addFields: {
@@ -617,7 +629,6 @@ module.exports.thongKeViolent = async (req, res) => {
       let dataAll1 = await alertModel.aggregate(queryAll1);
 
       return successResponse(res, dataAll1, 200, "Success");
-
     }
     if (typeSoftware == "FMS3") {
       let queryAll2 = [
@@ -631,20 +642,21 @@ module.exports.thongKeViolent = async (req, res) => {
                 $or: [
                   {
                     $and: [
-                      { alert_type: {$regex:"USB.*",$options:"$i"} },
-                      { "alert_info.diskinfo": { $regex: "(Khong an toan).*" } },
+                      { alert_type: { $regex: "USB.*", $options: "$i" } },
+                      {
+                        "alert_info.diskinfo": { $regex: "(Khong an toan).*" },
+                      },
                     ],
                   },
-                  { alert_type: {$regex:"Internet.*",$options:"$i"} },
+                  { alert_type: { $regex: "Internet.*", $options: "$i" } },
                   { alert_type: "Ket noi quan su" },
-                ]
-              }
-            ]
+                ],
+              },
+            ],
           },
         },
         {
-          $match:
-            conditionsUser
+          $match: conditionsUser,
         },
         {
           $addFields: {
@@ -687,7 +699,6 @@ module.exports.thongKeViolent = async (req, res) => {
       let dataAll2 = await alertModel.aggregate(queryAll2);
 
       return successResponse(res, dataAll2, 200, "Success");
-
     }
   }
 
@@ -707,22 +718,23 @@ module.exports.thongKeViolent = async (req, res) => {
                 $or: [
                   {
                     $and: [
-                      { alert_type: {$regex:"USB.*",$options:"$i"} },
-                      { "alert_info.diskinfo": { $regex: "(Khong an toan).*" } },
+                      { alert_type: { $regex: "USB.*", $options: "$i" } },
+                      {
+                        "alert_info.diskinfo": { $regex: "(Khong an toan).*" },
+                      },
                     ],
                   },
-                  { alert_type: {$regex:"Internet.*",$options:"$i"} },
+                  { alert_type: { $regex: "Internet.*", $options: "$i" } },
                   { alert_type: "Ket noi quan su" },
-                ]
+                ],
               },
               { updated_at: { $gte: new Date(startDate) } },
-              { updated_at: { $lte: new Date(endDate) } }
-            ]
+              { updated_at: { $lte: new Date(endDate) } },
+            ],
           },
         },
         {
-          $match:
-            conditionsUser
+          $match: conditionsUser,
         },
         {
           $addFields: {
@@ -765,7 +777,6 @@ module.exports.thongKeViolent = async (req, res) => {
       let data1 = await alertModel.aggregate(query1);
 
       return successResponse(res, data1, 200, "Success");
-
     }
 
     if (unit.level == "2") {
@@ -779,22 +790,23 @@ module.exports.thongKeViolent = async (req, res) => {
                 $or: [
                   {
                     $and: [
-                      { alert_type: {$regex:"USB.*",$options:"$i"} },
-                      { "alert_info.diskinfo": { $regex: "(Khong an toan).*" } },
+                      { alert_type: { $regex: "USB.*", $options: "$i" } },
+                      {
+                        "alert_info.diskinfo": { $regex: "(Khong an toan).*" },
+                      },
                     ],
                   },
-                  { alert_type: {$regex:"Internet.*",$options:"$i"} },
+                  { alert_type: { $regex: "Internet.*", $options: "$i" } },
                   { alert_type: "Ket noi quan su" },
-                ]
+                ],
               },
               { updated_at: { $gte: new Date(startDate) } },
-              { updated_at: { $lte: new Date(endDate) } }
-            ]
+              { updated_at: { $lte: new Date(endDate) } },
+            ],
           },
         },
         {
-          $match:
-            conditionsUser
+          $match: conditionsUser,
         },
         {
           $addFields: {
@@ -842,12 +854,16 @@ module.exports.thongKeViolent = async (req, res) => {
 
 // Cac ham phuc vu dashboard
 //May tinh quan su ket noi Internet
-async function deviceConnectInternet(unit_code, startDate, endDate, conditionsUser) {
+async function deviceConnectInternet(
+  unit_code,
+  startDate,
+  endDate,
+  conditionsUser
+) {
   if (unit_code == "all") {
     let query = [
       {
-        $match:
-          conditionsUser
+        $match: conditionsUser,
       },
       {
         $match: {
@@ -855,8 +871,8 @@ async function deviceConnectInternet(unit_code, startDate, endDate, conditionsUs
             { $or: conditionCheck },
             { updated_at: { $gte: new Date(startDate) } },
             { updated_at: { $lte: new Date(endDate) } },
-            { alert_type: {$regex:"Internet.*",$options:"$i"} },
-          ]
+            { alert_type: { $regex: "Internet.*", $options: "$i" } },
+          ],
         },
       },
 
@@ -879,8 +895,7 @@ async function deviceConnectInternet(unit_code, startDate, endDate, conditionsUs
   } else {
     let query = [
       {
-        $match:
-          conditionsUser
+        $match: conditionsUser,
       },
       {
         $match: {
@@ -889,7 +904,7 @@ async function deviceConnectInternet(unit_code, startDate, endDate, conditionsUs
             { "idParent.unit_code": unit_code },
             { updated_at: { $gte: new Date(startDate) } },
             { updated_at: { $lte: new Date(endDate) } },
-            { alert_type: {$regex:"Internet.*",$options:"$i"} },
+            { alert_type: { $regex: "Internet.*", $options: "$i" } },
           ],
         },
       },
@@ -914,12 +929,16 @@ async function deviceConnectInternet(unit_code, startDate, endDate, conditionsUs
 }
 
 //May khong ket noi mang
-async function deviceNotRegisterNetwork(unit_code, startDate, endDate, conditionsUser) {
+async function deviceNotRegisterNetwork(
+  unit_code,
+  startDate,
+  endDate,
+  conditionsUser
+) {
   if (unit_code == "all") {
     let query = [
       {
-        $match:
-          conditionsUser
+        $match: conditionsUser,
       },
       {
         $match: {
@@ -927,8 +946,8 @@ async function deviceNotRegisterNetwork(unit_code, startDate, endDate, condition
             { "ident_info.network_type": "Không kết nối mạng" },
             { $or: conditionCheck },
             { last_time_receive: { $gte: startDate } },
-            { last_time_receive: { $lte: endDate } }
-          ]
+            { last_time_receive: { $lte: endDate } },
+          ],
         },
       },
 
@@ -945,8 +964,7 @@ async function deviceNotRegisterNetwork(unit_code, startDate, endDate, condition
   } else {
     let query = [
       {
-        $match:
-          conditionsUser
+        $match: conditionsUser,
       },
       {
         $match: {
@@ -955,7 +973,7 @@ async function deviceNotRegisterNetwork(unit_code, startDate, endDate, condition
             { $or: conditionCheck },
             { "idParent.unit_code": unit_code },
             { last_time_receive: { $gte: startDate } },
-            { last_time_receive: { $lte: endDate } }
+            { last_time_receive: { $lte: endDate } },
           ],
         },
       },
@@ -974,12 +992,16 @@ async function deviceNotRegisterNetwork(unit_code, startDate, endDate, condition
 }
 
 //May Internet ket noi quan su
-async function deviceConnectTSLqs(unit_code, startDate, endDate, conditionsUser) {
+async function deviceConnectTSLqs(
+  unit_code,
+  startDate,
+  endDate,
+  conditionsUser
+) {
   if (unit_code == "all") {
     let query = [
       {
-        $match:
-          conditionsUser
+        $match: conditionsUser,
       },
       {
         $match: {
@@ -987,8 +1009,8 @@ async function deviceConnectTSLqs(unit_code, startDate, endDate, conditionsUser)
             { "ident_info.network_type": "Internet" },
             { $or: conditionCheck },
             { last_time_receive: { $gte: startDate } },
-            { last_time_receive: { $lte: endDate } }
-          ]
+            { last_time_receive: { $lte: endDate } },
+          ],
         },
       },
 
@@ -1005,8 +1027,7 @@ async function deviceConnectTSLqs(unit_code, startDate, endDate, conditionsUser)
   } else {
     let query = [
       {
-        $match:
-          conditionsUser
+        $match: conditionsUser,
       },
       {
         $match: {
@@ -1015,7 +1036,7 @@ async function deviceConnectTSLqs(unit_code, startDate, endDate, conditionsUser)
             { $or: conditionCheck },
             { "idParent.unit_code": unit_code },
             { last_time_receive: { $gte: startDate } },
-            { last_time_receive: { $lte: endDate } }
+            { last_time_receive: { $lte: endDate } },
           ],
         },
       },
@@ -1038,8 +1059,7 @@ async function devicePlugInUSB(unit_code, startDate, endDate, conditionsUser) {
   if (unit_code == "all") {
     let query = [
       {
-        $match:
-          conditionsUser
+        $match: conditionsUser,
       },
       {
         $match: {
@@ -1047,9 +1067,9 @@ async function devicePlugInUSB(unit_code, startDate, endDate, conditionsUser) {
             { $or: conditionCheck },
             { updated_at: { $gte: new Date(startDate) } },
             { updated_at: { $lte: new Date(endDate) } },
-            { alert_type: {$regex:"USB.*",$options:"$i"} },
-            { "alert_info.diskinfo": { $regex: "(Khong an toan).*" } }
-          ]
+            { alert_type: { $regex: "USB.*", $options: "$i" } },
+            { "alert_info.diskinfo": { $regex: "(Khong an toan).*" } },
+          ],
         },
       },
 
@@ -1072,20 +1092,20 @@ async function devicePlugInUSB(unit_code, startDate, endDate, conditionsUser) {
   } else {
     let query = [
       {
-        $match:
-          conditionsUser
+        $match: conditionsUser,
       },
       {
         $match: {
-          $and: [{
-            $or: conditionCheck
-          },
-          { "idParent.unit_code": unit_code },
-          { updated_at: { $gte: new Date(startDate) } },
-          { updated_at: { $lte: new Date(endDate) } },
-          { alert_type: {$regex:"USB.*",$options:"$i"} },
-          { "alert_info.diskinfo": { $regex: "(Khong an toan).*" } }
-          ]
+          $and: [
+            {
+              $or: conditionCheck,
+            },
+            { "idParent.unit_code": unit_code },
+            { updated_at: { $gte: new Date(startDate) } },
+            { updated_at: { $lte: new Date(endDate) } },
+            { alert_type: { $regex: "USB.*", $options: "$i" } },
+            { "alert_info.diskinfo": { $regex: "(Khong an toan).*" } },
+          ],
         },
       },
 
@@ -1109,12 +1129,16 @@ async function devicePlugInUSB(unit_code, startDate, endDate, conditionsUser) {
 }
 
 //Thiet bị truy cap C&C Domain
-async function deviceCandCDomain(unit_code, startDate, endDate, conditionsUser) {
+async function deviceCandCDomain(
+  unit_code,
+  startDate,
+  endDate,
+  conditionsUser
+) {
   if (unit_code == "all") {
     let query = [
       {
-        $match:
-          conditionsUser
+        $match: conditionsUser,
       },
       {
         $match: {
@@ -1122,8 +1146,8 @@ async function deviceCandCDomain(unit_code, startDate, endDate, conditionsUser) 
             { $or: conditionCheck },
             { updated_at: { $gte: new Date(startDate) } },
             { updated_at: { $lte: new Date(endDate) } },
-            { alert_type: {$regex:"Black_domain.*",$options:"$i"} },
-          ]
+            { alert_type: { $regex: "Black_domain.*", $options: "$i" } },
+          ],
         },
       },
 
@@ -1146,8 +1170,7 @@ async function deviceCandCDomain(unit_code, startDate, endDate, conditionsUser) 
   } else {
     let query = [
       {
-        $match:
-          conditionsUser
+        $match: conditionsUser,
       },
       {
         $match: {
@@ -1156,8 +1179,8 @@ async function deviceCandCDomain(unit_code, startDate, endDate, conditionsUser) 
             { "idParent.unit_code": unit_code },
             { updated_at: { $gte: new Date(startDate) } },
             { updated_at: { $lte: new Date(endDate) } },
-            { alert_type: {$regex:"Black_domain.*",$options:"$i"} },
-          ]
+            { alert_type: { $regex: "Black_domain.*", $options: "$i" } },
+          ],
         },
       },
 
@@ -1184,8 +1207,7 @@ async function deviceCandCIP(unit_code, startDate, endDate, conditionsUser) {
   if (unit_code == "all") {
     let query = [
       {
-        $match:
-          conditionsUser
+        $match: conditionsUser,
       },
       {
         $match: {
@@ -1193,9 +1215,9 @@ async function deviceCandCIP(unit_code, startDate, endDate, conditionsUser) {
             { $or: conditionCheck },
             { updated_at: { $gte: new Date(startDate) } },
             { updated_at: { $lte: new Date(endDate) } },
-            { alert_type: {$regex:"Black_ip.*",$options:"$i"} },
-          ]
-        }
+            { alert_type: { $regex: "Black_ip.*", $options: "$i" } },
+          ],
+        },
       },
 
       {
@@ -1217,8 +1239,7 @@ async function deviceCandCIP(unit_code, startDate, endDate, conditionsUser) {
   } else {
     let query = [
       {
-        $match:
-          conditionsUser
+        $match: conditionsUser,
       },
       {
         $match: {
@@ -1227,8 +1248,8 @@ async function deviceCandCIP(unit_code, startDate, endDate, conditionsUser) {
             { "idParent.unit_code": unit_code },
             { updated_at: { $gte: new Date(startDate) } },
             { updated_at: { $lte: new Date(endDate) } },
-            { alert_type: {$regex:"Black_ip.*",$options:"$i"} },
-          ]
+            { alert_type: { $regex: "Black_ip.*", $options: "$i" } },
+          ],
         },
       },
 
@@ -1255,8 +1276,7 @@ async function deviceMalwareLV1(unit_code, startDate, endDate, conditionsUser) {
   if (unit_code == "all") {
     let query = [
       {
-        $match:
-          conditionsUser
+        $match: conditionsUser,
       },
       {
         $match: {
@@ -1264,9 +1284,9 @@ async function deviceMalwareLV1(unit_code, startDate, endDate, conditionsUser) {
             { $or: conditionCheck },
             { updated_at: { $gte: new Date(startDate) } },
             { updated_at: { $lte: new Date(endDate) } },
-            { alert_type: {$regex:"Malware.*",$options:"$i"} },
-            { alert_level_id: "3" }
-          ]
+            { alert_type: { $regex: "Malware.*", $options: "$i" } },
+            { alert_level_id: "3" },
+          ],
         },
       },
 
@@ -1289,8 +1309,7 @@ async function deviceMalwareLV1(unit_code, startDate, endDate, conditionsUser) {
   } else {
     let query = [
       {
-        $match:
-          conditionsUser
+        $match: conditionsUser,
       },
       {
         $match: {
@@ -1299,9 +1318,9 @@ async function deviceMalwareLV1(unit_code, startDate, endDate, conditionsUser) {
             { "idParent.unit_code": unit_code },
             { updated_at: { $gte: new Date(startDate) } },
             { updated_at: { $lte: new Date(endDate) } },
-            { alert_type: {$regex:"Malware.*",$options:"$i"} },
-            { alert_level_id: "3" }
-          ]
+            { alert_type: { $regex: "Malware.*", $options: "$i" } },
+            { alert_level_id: "3" },
+          ],
         },
       },
 
@@ -1329,8 +1348,7 @@ async function deviceMalwareLV2(unit_code, startDate, endDate, conditionsUser) {
   if (unit_code == "all") {
     let query = [
       {
-        $match:
-          conditionsUser
+        $match: conditionsUser,
       },
       {
         $match: {
@@ -1338,9 +1356,9 @@ async function deviceMalwareLV2(unit_code, startDate, endDate, conditionsUser) {
             { $or: conditionCheck },
             { updated_at: { $gte: new Date(startDate) } },
             { updated_at: { $lte: new Date(endDate) } },
-            { alert_type: {$regex:"Malware.*",$options:"$i"} },
-            { alert_level_id: "2" }
-          ]
+            { alert_type: { $regex: "Malware.*", $options: "$i" } },
+            { alert_level_id: "2" },
+          ],
         },
       },
 
@@ -1363,8 +1381,7 @@ async function deviceMalwareLV2(unit_code, startDate, endDate, conditionsUser) {
   } else {
     let query = [
       {
-        $match:
-          conditionsUser
+        $match: conditionsUser,
       },
       {
         $match: {
@@ -1373,9 +1390,9 @@ async function deviceMalwareLV2(unit_code, startDate, endDate, conditionsUser) {
             { "idParent.unit_code": unit_code },
             { updated_at: { $gte: new Date(startDate) } },
             { updated_at: { $lte: new Date(endDate) } },
-            { alert_type: {$regex:"Malware.*",$options:"$i"} },
-            { alert_level_id: "3" }
-          ]
+            { alert_type: { $regex: "Malware.*", $options: "$i" } },
+            { alert_level_id: "3" },
+          ],
         },
       },
 
@@ -1403,8 +1420,7 @@ async function MiAVTotal(unit_code, startDate, endDate, conditionsUser) {
   if (unit_code == "all") {
     let query = [
       {
-        $match:
-          conditionsUser
+        $match: conditionsUser,
       },
       {
         $match: {
@@ -1414,8 +1430,8 @@ async function MiAVTotal(unit_code, startDate, endDate, conditionsUser) {
             { last_seen_miav: { $ne: [] } },
             { $or: conditionCheck },
             { last_time_receive: { $gte: startDate } },
-            { last_time_receive: { $lte: endDate } }
-          ]
+            { last_time_receive: { $lte: endDate } },
+          ],
         },
       },
 
@@ -1432,8 +1448,7 @@ async function MiAVTotal(unit_code, startDate, endDate, conditionsUser) {
   } else {
     let query = [
       {
-        $match:
-          conditionsUser
+        $match: conditionsUser,
       },
       {
         $match: {
@@ -1444,7 +1459,7 @@ async function MiAVTotal(unit_code, startDate, endDate, conditionsUser) {
             { $or: conditionCheck },
             { "idParent.unit_code": unit_code },
             { last_time_receive: { $gte: startDate } },
-            { last_time_receive: { $lte: endDate } }
+            { last_time_receive: { $lte: endDate } },
           ],
         },
       },
@@ -1467,8 +1482,7 @@ async function MiAVNotInstall(unit_code, startDate, endDate, conditionsUser) {
   if (unit_code == "all") {
     let query = [
       {
-        $match:
-          conditionsUser
+        $match: conditionsUser,
       },
       {
         $match: {
@@ -1478,14 +1492,19 @@ async function MiAVNotInstall(unit_code, startDate, endDate, conditionsUser) {
                 { last_seen_miav: "" },
                 { last_seen_miav: null },
                 { last_seen_miav: [] },
-                { miav_version: {$exists:false} },
-              ]
+                { miav_version: { $exists: false } },
+              ],
             },
-            {$or:[{ "ident_info.type": "Máy Tính" },{ "ident_info.type": "Máy Chủ" }]},
+            {
+              $or: [
+                { "ident_info.type": "Máy Tính" },
+                { "ident_info.type": "Máy Chủ" },
+              ],
+            },
             { $or: conditionCheck },
             { last_time_receive: { $gte: startDate } },
-            { last_time_receive: { $lte: endDate } }
-          ]
+            { last_time_receive: { $lte: endDate } },
+          ],
         },
       },
 
@@ -1502,8 +1521,7 @@ async function MiAVNotInstall(unit_code, startDate, endDate, conditionsUser) {
   } else {
     let query = [
       {
-        $match:
-          conditionsUser
+        $match: conditionsUser,
       },
       {
         $match: {
@@ -1513,15 +1531,20 @@ async function MiAVNotInstall(unit_code, startDate, endDate, conditionsUser) {
                 { last_seen_miav: "" },
                 { last_seen_miav: null },
                 { last_seen_miav: [] },
-                { miav_version: {$exists:false} },
-              ]
+                { miav_version: { $exists: false } },
+              ],
             },
-            {$or:[{ "ident_info.type": "Máy Tính" },{ "ident_info.type": "Máy Chủ" }]},
+            {
+              $or: [
+                { "ident_info.type": "Máy Tính" },
+                { "ident_info.type": "Máy Chủ" },
+              ],
+            },
             { "idParent.unit_code": unit_code },
             { $or: conditionCheck },
             { last_time_receive: { $gte: startDate } },
-            { last_time_receive: { $lte: endDate } }
-          ]
+            { last_time_receive: { $lte: endDate } },
+          ],
         },
       },
       {
@@ -1543,8 +1566,7 @@ async function MiAVActive(unit_code, startDate, endDate, conditionsUser) {
   if (unit_code == "all") {
     let query = [
       {
-        $match:
-          conditionsUser
+        $match: conditionsUser,
       },
       {
         $match: {
@@ -1554,32 +1576,41 @@ async function MiAVActive(unit_code, startDate, endDate, conditionsUser) {
             { last_seen_miav: { $ne: [] } },
             { $or: conditionCheck },
             { last_time_receive: { $gte: startDate } },
-            { last_time_receive: { $lte: endDate } }
+            { last_time_receive: { $lte: endDate } },
           ],
         },
       },
 
       {
-        $project:
-        {
-          last_time_receive: { $dateFromString: { dateString: "$last_time_receive" } },
-          last_seen_miav: { $dateFromString: { dateString: "$last_seen_miav" } }
-        }
+        $project: {
+          last_time_receive: {
+            $dateFromString: { dateString: "$last_time_receive" },
+          },
+          last_seen_miav: {
+            $dateFromString: { dateString: "$last_seen_miav" },
+          },
+        },
       },
       {
-        $addFields: { time_check: { $subtract: ["$last_time_receive", 60 * 1000 * 60 * 24 * parseInt(checkDay)] } }
+        $addFields: {
+          time_check: {
+            $subtract: [
+              "$last_time_receive",
+              60 * 1000 * 60 * 24 * parseInt(checkDay),
+            ],
+          },
+        },
       },
       {
-        $project:
-        {
+        $project: {
           last_seen_miav: 1,
           last_time_receive: 1,
           time_check: 1,
-          eq: { $cond: [{ $gte: ["$last_seen_miav", "$time_check"] }, 1, 0] }
-        }
+          eq: { $cond: [{ $gte: ["$last_seen_miav", "$time_check"] }, 1, 0] },
+        },
       },
       {
-        $match: { eq: 1 }
+        $match: { eq: 1 },
       },
       {
         $count: "total",
@@ -1594,8 +1625,7 @@ async function MiAVActive(unit_code, startDate, endDate, conditionsUser) {
   } else {
     let query = [
       {
-        $match:
-          conditionsUser
+        $match: conditionsUser,
       },
       {
         $match: {
@@ -1607,31 +1637,40 @@ async function MiAVActive(unit_code, startDate, endDate, conditionsUser) {
             { last_time_receive: { $gte: startDate } },
             { last_time_receive: { $lte: endDate } },
             { "idParent.unit_code": unit_code },
-          ]
+          ],
         },
       },
 
       {
-        $project:
-        {
-          last_time_receive: { $dateFromString: { dateString: "$last_time_receive" } },
-          last_seen_miav: { $dateFromString: { dateString: "$last_seen_miav" } }
-        }
+        $project: {
+          last_time_receive: {
+            $dateFromString: { dateString: "$last_time_receive" },
+          },
+          last_seen_miav: {
+            $dateFromString: { dateString: "$last_seen_miav" },
+          },
+        },
       },
       {
-        $addFields: { time_check: { $subtract: ["$last_time_receive", 60 * 1000 * 60 * 24 * parseInt(checkDay)] } }
+        $addFields: {
+          time_check: {
+            $subtract: [
+              "$last_time_receive",
+              60 * 1000 * 60 * 24 * parseInt(checkDay),
+            ],
+          },
+        },
       },
       {
-        $project:
-        {
+        $project: {
           last_seen_miav: 1,
           last_time_receive: 1,
           time_check: 1,
-          eq: { $cond: [{ $gte: ["$last_seen_miav", "$time_check"] }, 1, 0] }
-        }
+          eq: { $cond: [{ $gte: ["$last_seen_miav", "$time_check"] }, 1, 0] },
+        },
       },
       {
-        $match: { eq: 1 }
+        $match: { eq: 1 },
       },
       {
         $count: "total",
@@ -1653,8 +1692,7 @@ async function MiAVNotConnect(unit_code, startDate, endDate, conditionsUser) {
   if (unit_code == "all") {
     let query = [
       {
-        $match:
-          conditionsUser
+        $match: conditionsUser,
       },
       {
         $match: {
@@ -1664,32 +1702,41 @@ async function MiAVNotConnect(unit_code, startDate, endDate, conditionsUser) {
             { last_seen_miav: { $ne: [] } },
             { $or: conditionCheck },
             { last_time_receive: { $gte: startDate } },
-            { last_time_receive: { $lte: endDate } }
+            { last_time_receive: { $lte: endDate } },
           ],
         },
       },
 
       {
-        $project:
-        {
-          last_time_receive: { $dateFromString: { dateString: "$last_time_receive" } },
-          last_seen_miav: { $dateFromString: { dateString: "$last_seen_miav" } }
-        }
+        $project: {
+          last_time_receive: {
+            $dateFromString: { dateString: "$last_time_receive" },
+          },
+          last_seen_miav: {
+            $dateFromString: { dateString: "$last_seen_miav" },
+          },
+        },
       },
       {
-        $addFields: { time_check: { $subtract: ["$last_time_receive", 60 * 1000 * 60 * 24 * parseInt(checkDay)] } }
+        $addFields: {
+          time_check: {
+            $subtract: [
+              "$last_time_receive",
+              60 * 1000 * 60 * 24 * parseInt(checkDay),
+            ],
+          },
+        },
       },
       {
-        $project:
-        {
+        $project: {
           last_seen_miav: 1,
           last_time_receive: 1,
           time_check: 1,
-          eq: { $cond: [{ $gte: ["$last_seen_miav", "$time_check"] }, 1, 0] }
-        }
+          eq: { $cond: [{ $gte: ["$last_seen_miav", "$time_check"] }, 1, 0] },
+        },
       },
       {
-        $match: { eq: 0 }
+        $match: { eq: 0 },
       },
       {
         $count: "total",
@@ -1704,8 +1751,7 @@ async function MiAVNotConnect(unit_code, startDate, endDate, conditionsUser) {
   } else {
     let query = [
       {
-        $match:
-          conditionsUser
+        $match: conditionsUser,
       },
       {
         $match: {
@@ -1718,30 +1764,38 @@ async function MiAVNotConnect(unit_code, startDate, endDate, conditionsUser) {
             { last_time_receive: { $lte: endDate } },
             { "idParent.unit_code": unit_code },
           ],
-
         },
       },
       {
-        $project:
-        {
-          last_time_receive: { $dateFromString: { dateString: "$last_time_receive" } },
-          last_seen_miav: { $dateFromString: { dateString: "$last_seen_miav" } }
-        }
+        $project: {
+          last_time_receive: {
+            $dateFromString: { dateString: "$last_time_receive" },
+          },
+          last_seen_miav: {
+            $dateFromString: { dateString: "$last_seen_miav" },
+          },
+        },
       },
       {
-        $addFields: { time_check: { $subtract: ["$last_time_receive", 60 * 1000 * 60 * 24 * parseInt(checkDay)] } }
+        $addFields: {
+          time_check: {
+            $subtract: [
+              "$last_time_receive",
+              60 * 1000 * 60 * 24 * parseInt(checkDay),
+            ],
+          },
+        },
       },
       {
-        $project:
-        {
+        $project: {
           last_seen_miav: 1,
           last_time_receive: 1,
           time_check: 1,
-          eq: { $cond: [{ $gte: ["$last_seen_miav", "$time_check"] }, 1, 0] }
-        }
+          eq: { $cond: [{ $gte: ["$last_seen_miav", "$time_check"] }, 1, 0] },
+        },
       },
       {
-        $match: { eq: 0 }
+        $match: { eq: 0 },
       },
       {
         $count: "total",
@@ -1761,17 +1815,16 @@ async function DeviceTotal(unit_code, startDate, endDate, conditionsUser) {
   if (unit_code == "all") {
     let query = [
       {
-        $match:
-          conditionsUser
+        $match: conditionsUser,
       },
       {
         $match: {
           $and: [
             { $or: conditionCheck },
             { last_time_receive: { $gte: startDate } },
-            { last_time_receive: { $lte: endDate } }
-          ]
-        }
+            { last_time_receive: { $lte: endDate } },
+          ],
+        },
       },
 
       {
@@ -1787,8 +1840,7 @@ async function DeviceTotal(unit_code, startDate, endDate, conditionsUser) {
   } else {
     let query = [
       {
-        $match:
-          conditionsUser
+        $match: conditionsUser,
       },
       {
         $match: {
@@ -1796,9 +1848,9 @@ async function DeviceTotal(unit_code, startDate, endDate, conditionsUser) {
             { $or: conditionCheck },
             { "idParent.unit_code": unit_code },
             { last_time_receive: { $gte: startDate } },
-            { last_time_receive: { $lte: endDate } }
-          ]
-        }
+            { last_time_receive: { $lte: endDate } },
+          ],
+        },
       },
 
       {
@@ -1819,8 +1871,7 @@ async function DeviceIdent(unit_code, startDate, endDate, conditionsUser) {
   if (unit_code == "all") {
     let query = [
       {
-        $match:
-          conditionsUser
+        $match: conditionsUser,
       },
       {
         $match: {
@@ -1830,7 +1881,7 @@ async function DeviceIdent(unit_code, startDate, endDate, conditionsUser) {
             { ident_info: { $ne: [] } },
             { $or: conditionCheck },
             { last_time_receive: { $gte: startDate } },
-            { last_time_receive: { $lte: endDate } }
+            { last_time_receive: { $lte: endDate } },
           ],
         },
       },
@@ -1848,8 +1899,7 @@ async function DeviceIdent(unit_code, startDate, endDate, conditionsUser) {
   } else {
     let query = [
       {
-        $match:
-          conditionsUser
+        $match: conditionsUser,
       },
       {
         $match: {
@@ -1860,7 +1910,7 @@ async function DeviceIdent(unit_code, startDate, endDate, conditionsUser) {
             { $or: conditionCheck },
             { "idParent.unit_code": unit_code },
             { last_time_receive: { $gte: startDate } },
-            { last_time_receive: { $lte: endDate } }
+            { last_time_receive: { $lte: endDate } },
           ],
         },
       },
@@ -1883,23 +1933,22 @@ async function DeviceNotIdent(unit_code, startDate, endDate, conditionsUser) {
   if (unit_code == "all") {
     let query = [
       {
-        $match:
-          conditionsUser
+        $match: conditionsUser,
       },
       {
         $match: {
           $and: [
             { $or: conditionCheck },
             { last_time_receive: { $gte: startDate } },
-            { last_time_receive: { $lte: endDate } }
-          ]
+            { last_time_receive: { $lte: endDate } },
+          ],
         },
       },
 
       {
         $match: {
           $or: [{ ident_info: "" }, { ident_info: null }, { ident_info: [] }],
-        }
+        },
       },
       {
         $count: "total",
@@ -1914,8 +1963,7 @@ async function DeviceNotIdent(unit_code, startDate, endDate, conditionsUser) {
   } else {
     let query = [
       {
-        $match:
-          conditionsUser
+        $match: conditionsUser,
       },
       {
         $match: {
@@ -1923,7 +1971,7 @@ async function DeviceNotIdent(unit_code, startDate, endDate, conditionsUser) {
             { $or: conditionCheck },
             { "idParent.unit_code": unit_code },
             { last_time_receive: { $gte: startDate } },
-            { last_time_receive: { $lte: endDate } }
+            { last_time_receive: { $lte: endDate } },
           ],
         },
       },
@@ -1953,15 +2001,11 @@ async function FMCOnline(unit_code, conditionsUser) {
   if (unit_code == "all") {
     let query = [
       {
-        $match:
-          conditionsUser
+        $match: conditionsUser,
       },
       {
         $match: {
-          $and: [
-            { $or: conditionCheck },
-            { type_software: "FMC" }
-          ],
+          $and: [{ $or: conditionCheck }, { type_software: "FMC" }],
         },
       },
 
@@ -1972,7 +2016,9 @@ async function FMCOnline(unit_code, conditionsUser) {
       },
       {
         $addFields: {
-          time_check: { $add: ["$last_time", 60 * 1000 * 60 * 24 * parseInt(checkDay)] },
+          time_check: {
+            $add: ["$last_time", 60 * 1000 * 60 * 24 * parseInt(checkDay)],
+          },
         },
       },
       {
@@ -1998,16 +2044,15 @@ async function FMCOnline(unit_code, conditionsUser) {
   } else {
     let query = [
       {
-        $match:
-          conditionsUser
+        $match: conditionsUser,
       },
       {
         $match: {
           $and: [
             { $or: conditionCheck },
             { "idParent.unit_code": unit_code },
-            { type_software: "FMC" }
-          ]
+            { type_software: "FMC" },
+          ],
         },
       },
 
@@ -2018,7 +2063,9 @@ async function FMCOnline(unit_code, conditionsUser) {
       },
       {
         $addFields: {
-          time_check: { $add: ["$last_time", 60 * 1000 * 60 * 24 * parseInt(checkDay)] },
+          time_check: {
+            $add: ["$last_time", 60 * 1000 * 60 * 24 * parseInt(checkDay)],
+          },
         },
       },
       {
@@ -2046,19 +2093,15 @@ async function FMCOnline(unit_code, conditionsUser) {
 //FMC offline
 async function FMCOffline(unit_code, conditionsUser) {
   let setting = await settingModel.findOne().sort({ updated_at: 1 }).lean();
-  let checkDay = setting.check_day_online
+  let checkDay = setting.check_day_online;
   if (unit_code == "all") {
     let query = [
       {
-        $match:
-          conditionsUser
+        $match: conditionsUser,
       },
       {
         $match: {
-          $and: [
-            { $or: conditionCheck },
-            { type_software: "FMC" }
-          ],
+          $and: [{ $or: conditionCheck }, { type_software: "FMC" }],
         },
       },
 
@@ -2069,7 +2112,9 @@ async function FMCOffline(unit_code, conditionsUser) {
       },
       {
         $addFields: {
-          time_check: { $add: ["$last_time", 60 * 1000 * 60 * 24 * parseInt(checkDay)] },
+          time_check: {
+            $add: ["$last_time", 60 * 1000 * 60 * 24 * parseInt(checkDay)],
+          },
         },
       },
       {
@@ -2095,15 +2140,14 @@ async function FMCOffline(unit_code, conditionsUser) {
   } else {
     let query = [
       {
-        $match:
-          conditionsUser
+        $match: conditionsUser,
       },
       {
         $match: {
           $and: [
             { $or: conditionCheck },
             { "idParent.unit_code": unit_code },
-            { type_software: "FMC" }
+            { type_software: "FMC" },
           ],
         },
       },
@@ -2115,7 +2159,9 @@ async function FMCOffline(unit_code, conditionsUser) {
       },
       {
         $addFields: {
-          time_check: { $add: ["$last_time", 60 * 1000 * 60 * 24 * parseInt(checkDay)] },
+          time_check: {
+            $add: ["$last_time", 60 * 1000 * 60 * 24 * parseInt(checkDay)],
+          },
         },
       },
       {
@@ -2143,12 +2189,11 @@ async function FMCOffline(unit_code, conditionsUser) {
 //FMS online
 async function FMSOnline(unit_code, conditionsUser) {
   let setting = await settingModel.findOne().sort({ updated_at: 1 }).lean();
-  let checkDay = setting.check_day_online
+  let checkDay = setting.check_day_online;
   if (unit_code == "all") {
     let query = [
       {
-        $match:
-          conditionsUser
+        $match: conditionsUser,
       },
       {
         $match: {
@@ -2159,9 +2204,9 @@ async function FMSOnline(unit_code, conditionsUser) {
                 { type_software: "FMS1" },
                 { type_software: "FMS2" },
                 { type_software: "FMS3" },
-              ]
-            }
-          ]
+              ],
+            },
+          ],
         },
       },
 
@@ -2172,7 +2217,9 @@ async function FMSOnline(unit_code, conditionsUser) {
       },
       {
         $addFields: {
-          time_check: { $add: ["$last_time", 60 * 1000 * 60 * 24 * parseInt(checkDay)] },
+          time_check: {
+            $add: ["$last_time", 60 * 1000 * 60 * 24 * parseInt(checkDay)],
+          },
         },
       },
       {
@@ -2198,8 +2245,7 @@ async function FMSOnline(unit_code, conditionsUser) {
   } else {
     let query = [
       {
-        $match:
-          conditionsUser
+        $match: conditionsUser,
       },
       {
         $match: {
@@ -2211,9 +2257,9 @@ async function FMSOnline(unit_code, conditionsUser) {
                 { type_software: "FMS1" },
                 { type_software: "FMS2" },
                 { type_software: "FMS3" },
-              ]
-            }
-          ]
+              ],
+            },
+          ],
         },
       },
 
@@ -2224,7 +2270,9 @@ async function FMSOnline(unit_code, conditionsUser) {
       },
       {
         $addFields: {
-          time_check: { $add: ["$last_time", 60 * 1000 * 60 * 24 * parseInt(checkDay)] },
+          time_check: {
+            $add: ["$last_time", 60 * 1000 * 60 * 24 * parseInt(checkDay)],
+          },
         },
       },
       {
@@ -2252,12 +2300,11 @@ async function FMSOnline(unit_code, conditionsUser) {
 //FMS offline
 async function FMSOffline(unit_code, conditionsUser) {
   let setting = await settingModel.findOne().sort({ updated_at: 1 }).lean();
-  let checkDay = setting.check_day_online
+  let checkDay = setting.check_day_online;
   if (unit_code == "all") {
     let query = [
       {
-        $match:
-          conditionsUser
+        $match: conditionsUser,
       },
       {
         $match: {
@@ -2268,9 +2315,9 @@ async function FMSOffline(unit_code, conditionsUser) {
                 { type_software: "FMS1" },
                 { type_software: "FMS2" },
                 { type_software: "FMS3" },
-              ]
-            }
-          ]
+              ],
+            },
+          ],
         },
       },
 
@@ -2281,7 +2328,9 @@ async function FMSOffline(unit_code, conditionsUser) {
       },
       {
         $addFields: {
-          time_check: { $add: ["$last_time", 60 * 1000 * 60 * 24 * parseInt(checkDay)] },
+          time_check: {
+            $add: ["$last_time", 60 * 1000 * 60 * 24 * parseInt(checkDay)],
+          },
         },
       },
       {
@@ -2307,8 +2356,7 @@ async function FMSOffline(unit_code, conditionsUser) {
   } else {
     let query = [
       {
-        $match:
-          conditionsUser
+        $match: conditionsUser,
       },
       {
         $match: {
@@ -2320,9 +2368,9 @@ async function FMSOffline(unit_code, conditionsUser) {
                 { type_software: "FMS1" },
                 { type_software: "FMS2" },
                 { type_software: "FMS3" },
-              ]
-            }
-          ]
+              ],
+            },
+          ],
         },
       },
 
@@ -2333,7 +2381,9 @@ async function FMSOffline(unit_code, conditionsUser) {
       },
       {
         $addFields: {
-          time_check: { $add: ["$last_time", 60 * 1000 * 60 * 24 * parseInt(checkDay)] },
+          time_check: {
+            $add: ["$last_time", 60 * 1000 * 60 * 24 * parseInt(checkDay)],
+          },
         },
       },
       {
@@ -2364,8 +2414,7 @@ async function unitMalware(unit_code, startDate, endDate, conditionsUser) {
     if (typeSoftware == "FMS1" || typeSoftware == "FMS2") {
       let queryAll1 = [
         {
-          $match:
-            conditionsUser
+          $match: conditionsUser,
         },
         {
           $match: {
@@ -2374,7 +2423,7 @@ async function unitMalware(unit_code, startDate, endDate, conditionsUser) {
               { updated_at: { $gte: new Date(startDate) } },
               { updated_at: { $lte: new Date(endDate) } },
               { alert_type: "Malware" },
-              { $or: [{ alert_level_id: "3" }, { alert_level_id: "2" }]}
+              { $or: [{ alert_level_id: "3" }, { alert_level_id: "2" }] },
             ],
           },
         },
@@ -2391,8 +2440,8 @@ async function unitMalware(unit_code, startDate, endDate, conditionsUser) {
         },
         {
           $addFields: {
-            dvc2: { $arrayElemAt: ["$DVC2", 0] }
-          }
+            dvc2: { $arrayElemAt: ["$DVC2", 0] },
+          },
         },
         {
           $group: {
@@ -2414,8 +2463,7 @@ async function unitMalware(unit_code, startDate, endDate, conditionsUser) {
     if (typeSoftware == "FMS3") {
       let queryAll2 = [
         {
-          $match:
-            conditionsUser
+          $match: conditionsUser,
         },
         {
           $match: {
@@ -2424,7 +2472,7 @@ async function unitMalware(unit_code, startDate, endDate, conditionsUser) {
               { updated_at: { $gte: new Date(startDate) } },
               { updated_at: { $lte: new Date(endDate) } },
               { alert_type: "Malware" },
-              { $or: [{ alert_level_id: "3" }, { alert_level_id: "2" }]}
+              { $or: [{ alert_level_id: "3" }, { alert_level_id: "2" }] },
             ],
           },
         },
@@ -2441,8 +2489,8 @@ async function unitMalware(unit_code, startDate, endDate, conditionsUser) {
         },
         {
           $addFields: {
-            dvc2: { $arrayElemAt: ["$DVC2", 0] }
-          }
+            dvc2: { $arrayElemAt: ["$DVC2", 0] },
+          },
         },
         {
           $group: {
@@ -2469,8 +2517,7 @@ async function unitMalware(unit_code, startDate, endDate, conditionsUser) {
     if (unit.level == "1") {
       let query1 = [
         {
-          $match:
-            conditionsUser
+          $match: conditionsUser,
         },
         {
           $match: {
@@ -2480,8 +2527,8 @@ async function unitMalware(unit_code, startDate, endDate, conditionsUser) {
               { updated_at: { $gte: new Date(startDate) } },
               { updated_at: { $lte: new Date(endDate) } },
               { alert_type: "Malware" },
-              { $or: [{ alert_level_id: "3" }, { alert_level_id: "2" }]}
-            ]
+              { $or: [{ alert_level_id: "3" }, { alert_level_id: "2" }] },
+            ],
           },
         },
 
@@ -2497,8 +2544,8 @@ async function unitMalware(unit_code, startDate, endDate, conditionsUser) {
         },
         {
           $addFields: {
-            dvc2: { $arrayElemAt: ["$DVC2", 0] }
-          }
+            dvc2: { $arrayElemAt: ["$DVC2", 0] },
+          },
         },
         {
           $group: {
@@ -2520,8 +2567,7 @@ async function unitMalware(unit_code, startDate, endDate, conditionsUser) {
     if (unit.level == "2") {
       let query2 = [
         {
-          $match:
-            conditionsUser
+          $match: conditionsUser,
         },
         {
           $match: {
@@ -2531,8 +2577,8 @@ async function unitMalware(unit_code, startDate, endDate, conditionsUser) {
               { updated_at: { $gte: new Date(startDate) } },
               { updated_at: { $lte: new Date(endDate) } },
               { alert_type: "Malware" },
-              { $or: [{ alert_level_id: "3" }, { alert_level_id: "2" }]}
-            ]
+              { $or: [{ alert_level_id: "3" }, { alert_level_id: "2" }] },
+            ],
           },
         },
 
@@ -2548,8 +2594,8 @@ async function unitMalware(unit_code, startDate, endDate, conditionsUser) {
         },
         {
           $addFields: {
-            dvc2: { $arrayElemAt: ["$DVC2", 0] }
-          }
+            dvc2: { $arrayElemAt: ["$DVC2", 0] },
+          },
         },
         {
           $group: {
@@ -2576,8 +2622,7 @@ async function unitCandC(unit_code, startDate, endDate, conditionsUser) {
     if (typeSoftware == "FMS1" || typeSoftware == "FMS2") {
       let queryAll1 = [
         {
-          $match:
-            conditionsUser
+          $match: conditionsUser,
         },
         {
           $match: {
@@ -2585,8 +2630,13 @@ async function unitCandC(unit_code, startDate, endDate, conditionsUser) {
               { $or: conditionCheck },
               { updated_at: { $gte: new Date(startDate) } },
               { updated_at: { $lte: new Date(endDate) } },
-              { $or: [{ alert_type: "Black_domain" }, { alert_type: "Black_ip" }] }
-            ]
+              {
+                $or: [
+                  { alert_type: "Black_domain" },
+                  { alert_type: "Black_ip" },
+                ],
+              },
+            ],
           },
         },
 
@@ -2602,8 +2652,8 @@ async function unitCandC(unit_code, startDate, endDate, conditionsUser) {
         },
         {
           $addFields: {
-            dvc2: { $arrayElemAt: ["$DVC2", 0] }
-          }
+            dvc2: { $arrayElemAt: ["$DVC2", 0] },
+          },
         },
         {
           $group: {
@@ -2625,8 +2675,7 @@ async function unitCandC(unit_code, startDate, endDate, conditionsUser) {
     if (typeSoftware == "FMS3") {
       let queryAll2 = [
         {
-          $match:
-            conditionsUser
+          $match: conditionsUser,
         },
         {
           $match: {
@@ -2634,8 +2683,13 @@ async function unitCandC(unit_code, startDate, endDate, conditionsUser) {
               { $or: conditionCheck },
               { updated_at: { $gte: new Date(startDate) } },
               { updated_at: { $lte: new Date(endDate) } },
-              { $or: [{ alert_type: "Black_domain" }, { alert_type: "Black_ip" }] }
-            ]
+              {
+                $or: [
+                  { alert_type: "Black_domain" },
+                  { alert_type: "Black_ip" },
+                ],
+              },
+            ],
           },
         },
 
@@ -2651,8 +2705,8 @@ async function unitCandC(unit_code, startDate, endDate, conditionsUser) {
         },
         {
           $addFields: {
-            dvc2: { $arrayElemAt: ["$DVC2", 0] }
-          }
+            dvc2: { $arrayElemAt: ["$DVC2", 0] },
+          },
         },
         {
           $group: {
@@ -2679,17 +2733,21 @@ async function unitCandC(unit_code, startDate, endDate, conditionsUser) {
     if (unit.level == "1") {
       let query1 = [
         {
-          $match:
-            conditionsUser
+          $match: conditionsUser,
         },
         {
           $match: {
             $and: [
               { "idParent.unit_code": unit_code },
-              { $or: [{ alert_type: "Black_domain" }, { alert_type: "Black_ip" }] },
+              {
+                $or: [
+                  { alert_type: "Black_domain" },
+                  { alert_type: "Black_ip" },
+                ],
+              },
               { $or: conditionCheck },
               { updated_at: { $gte: new Date(startDate) } },
-              { updated_at: { $lte: new Date(endDate) } }
+              { updated_at: { $lte: new Date(endDate) } },
             ],
           },
         },
@@ -2706,8 +2764,8 @@ async function unitCandC(unit_code, startDate, endDate, conditionsUser) {
         },
         {
           $addFields: {
-            dvc2: { $arrayElemAt: ["$DVC2", 0] }
-          }
+            dvc2: { $arrayElemAt: ["$DVC2", 0] },
+          },
         },
         {
           $group: {
@@ -2729,17 +2787,21 @@ async function unitCandC(unit_code, startDate, endDate, conditionsUser) {
     if (unit.level == "2") {
       let query2 = [
         {
-          $match:
-            conditionsUser
+          $match: conditionsUser,
         },
         {
           $match: {
             $and: [
               { "idParent.unit_code": unit_code },
-              { $or: [{ alert_type: "Black_domain" }, { alert_type: "Black_ip" }] },
+              {
+                $or: [
+                  { alert_type: "Black_domain" },
+                  { alert_type: "Black_ip" },
+                ],
+              },
               { $or: conditionCheck },
               { updated_at: { $gte: new Date(startDate) } },
-              { updated_at: { $lte: new Date(endDate) } }
+              { updated_at: { $lte: new Date(endDate) } },
             ],
           },
         },
@@ -2756,8 +2818,8 @@ async function unitCandC(unit_code, startDate, endDate, conditionsUser) {
         },
         {
           $addFields: {
-            dvc2: { $arrayElemAt: ["$DVC2", 0] }
-          }
+            dvc2: { $arrayElemAt: ["$DVC2", 0] },
+          },
         },
         {
           $group: {
@@ -2784,8 +2846,7 @@ async function unitViolate(unit_code, startDate, endDate, conditionsUser) {
     if (typeSoftware == "FMS1" || typeSoftware == "FMS2") {
       let queryAll1 = [
         {
-          $match:
-            conditionsUser
+          $match: conditionsUser,
         },
         {
           $addFields: {
@@ -2809,19 +2870,21 @@ async function unitViolate(unit_code, startDate, endDate, conditionsUser) {
                   {
                     $and: [
                       { alert_type: "USB" },
-                      { "alert_info.diskinfo": { $regex: "(Khong an toan).*" } },
+                      {
+                        "alert_info.diskinfo": { $regex: "(Khong an toan).*" },
+                      },
                     ],
                   },
                   { alert_type: "Internet" },
-                ]
-              }
-            ]
+                ],
+              },
+            ],
           },
         },
         {
           $addFields: {
-            dvc2: { $arrayElemAt: ["$DVC2", 0] }
-          }
+            dvc2: { $arrayElemAt: ["$DVC2", 0] },
+          },
         },
         {
           $group: {
@@ -2843,8 +2906,7 @@ async function unitViolate(unit_code, startDate, endDate, conditionsUser) {
     if (typeSoftware == "FMS3") {
       let queryAll2 = [
         {
-          $match:
-            conditionsUser
+          $match: conditionsUser,
         },
         {
           $match: {
@@ -2857,13 +2919,15 @@ async function unitViolate(unit_code, startDate, endDate, conditionsUser) {
                   {
                     $and: [
                       { alert_type: "USB" },
-                      { "alert_info.diskinfo": { $regex: "(Khong an toan).*" } },
+                      {
+                        "alert_info.diskinfo": { $regex: "(Khong an toan).*" },
+                      },
                     ],
                   },
                   { alert_type: "Internet" },
-                ]
-              }
-            ]
+                ],
+              },
+            ],
           },
         },
 
@@ -2879,8 +2943,8 @@ async function unitViolate(unit_code, startDate, endDate, conditionsUser) {
         },
         {
           $addFields: {
-            dvc2: { $arrayElemAt: ["$DVC2", 0] }
-          }
+            dvc2: { $arrayElemAt: ["$DVC2", 0] },
+          },
         },
         {
           $group: {
@@ -2907,8 +2971,7 @@ async function unitViolate(unit_code, startDate, endDate, conditionsUser) {
     if (unit.level == "1") {
       let query1 = [
         {
-          $match:
-            conditionsUser
+          $match: conditionsUser,
         },
         {
           $match: {
@@ -2920,15 +2983,17 @@ async function unitViolate(unit_code, startDate, endDate, conditionsUser) {
                   {
                     $and: [
                       { alert_type: "USB" },
-                      { "alert_info.diskinfo": { $regex: "(Khong an toan).*" } },
+                      {
+                        "alert_info.diskinfo": { $regex: "(Khong an toan).*" },
+                      },
                     ],
                   },
                   { alert_type: "Internet" },
-                ]
+                ],
               },
               { updated_at: { $gte: new Date(startDate) } },
-              { updated_at: { $lte: new Date(endDate) } }
-            ]
+              { updated_at: { $lte: new Date(endDate) } },
+            ],
           },
         },
 
@@ -2944,8 +3009,8 @@ async function unitViolate(unit_code, startDate, endDate, conditionsUser) {
         },
         {
           $addFields: {
-            dvc2: { $arrayElemAt: ["$DVC2", 0] }
-          }
+            dvc2: { $arrayElemAt: ["$DVC2", 0] },
+          },
         },
         {
           $group: {
@@ -2967,8 +3032,7 @@ async function unitViolate(unit_code, startDate, endDate, conditionsUser) {
     if (unit.level == "2") {
       let query2 = [
         {
-          $match:
-            conditionsUser
+          $match: conditionsUser,
         },
         {
           $match: {
@@ -2980,16 +3044,18 @@ async function unitViolate(unit_code, startDate, endDate, conditionsUser) {
                   {
                     $and: [
                       { alert_type: "USB" },
-                      { "alert_info.diskinfo": { $regex: "(Khong an toan).*" } },
+                      {
+                        "alert_info.diskinfo": { $regex: "(Khong an toan).*" },
+                      },
                     ],
                   },
                   { alert_type: "Internet" },
-                ]
+                ],
               },
               { updated_at: { $gte: new Date(startDate) } },
-              { updated_at: { $lte: new Date(endDate) } }
-            ]
-          }
+              { updated_at: { $lte: new Date(endDate) } },
+            ],
+          },
         },
 
         {
@@ -3004,8 +3070,8 @@ async function unitViolate(unit_code, startDate, endDate, conditionsUser) {
         },
         {
           $addFields: {
-            dvc2: { $arrayElemAt: ["$DVC2", 0] }
-          }
+            dvc2: { $arrayElemAt: ["$DVC2", 0] },
+          },
         },
         {
           $group: {
@@ -3030,7 +3096,7 @@ async function unitViolate(unit_code, startDate, endDate, conditionsUser) {
 var countResult = new Object();
 module.exports.tk = async (req, res) => {
   let authUser = req.authUser;
-  let conditionsUser = authUser.conditions_role
+  let conditionsUser = authUser.conditions_role;
   let startDate = req.body.start_date;
   let endDate = req.body.end_date;
   let unitCode = req.body.unit_code;
@@ -3056,8 +3122,8 @@ module.exports.tk = async (req, res) => {
     FMCOffline(unitCode, conditionsUser),
     FMSOffline(unitCode, conditionsUser),
     deviceConnectTSLqs(unitCode, startDate, endDate, conditionsUser),
-    MiAVNotInstall(unitCode,startDate, endDate, conditionsUser),
-    deviceNotRegisterNetwork(unitCode,startDate,endDate,conditionsUser)
+    MiAVNotInstall(unitCode, startDate, endDate, conditionsUser),
+    deviceNotRegisterNetwork(unitCode, startDate, endDate, conditionsUser),
   ];
 
   Promise.all(promises)
@@ -3082,8 +3148,8 @@ module.exports.tk = async (req, res) => {
       countResult.countFMCOffline = results[17];
       countResult.countFMSOffline = results[18];
       countResult.countdeviceConnectTSLqs = results[19];
-      countResult.countMiAVNotInstall=results[20]
-      countResult.countDeviceNotRegisterNetwork = results[21]
+      countResult.countMiAVNotInstall = results[20];
+      countResult.countDeviceNotRegisterNetwork = results[21];
       // res.send(countResult);
       return successResponse(res, countResult, 200, "Success");
     })
