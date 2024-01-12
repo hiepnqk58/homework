@@ -37,12 +37,11 @@ module.exports = async () => {
           "username",
           "admin"
         );
-          console.log(23234)
         if (!checkUserName) {
-          console.log(111111)
+          console.log(111111);
           await userModel.create(newUser);
           log.info("Create user success!!");
-        }      
+        }
       })
       .catch((error) => {
         console.log("MongoDB connection error:", error);
