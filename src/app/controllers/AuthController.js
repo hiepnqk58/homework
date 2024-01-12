@@ -4,7 +4,10 @@ const config = require("./../../configs/app");
 const mongoose = require("mongoose");
 const userModel = require("./../models/User");
 const secretKey = process.env.SECRET;
+const { checkToken } = require("./../../helper/common");
+const { getUserCurrent } = require("./../../helper/authTokenJWT");
 // const { client } = require("../../helper/connectRedis");
+var refreshTokens = {};
 const {
   successResponse,
   errorResponse,
@@ -50,14 +53,17 @@ module.exports.login = async (req, res) => {
   let isValidPassword = user
     ? await user.comparePassword(req.body.password)
     : false;
-  console.log(req.body.password);
   try {
     if (user && isValidPassword) {
       const { _id, username, role, condition } = user;
       var token = jwt.sign({ _id, username, role, condition }, config.secret, {
         expiresIn: config.expiresIn,
       });
-
+      var refreshToken = jwt.sign(
+        { _id, username, role, condition },
+        config.secret,
+        { expiresIn: "10d" }
+      );
       // await client.set(_id.toString(), token, "EX", 60 * 60);
       data = {
         id: user._id,
@@ -65,8 +71,10 @@ module.exports.login = async (req, res) => {
         display_name: user.display_name,
         role: user.role,
         token: token,
+        refreshToken: refreshToken,
         condition,
       };
+      refreshTokens[refreshToken] = data;
       return successResponse(res, data, 200, "Success");
     }
   } catch (err) {
@@ -170,7 +178,7 @@ module.exports.logout = async (req, res) => {
   return errorResponse(res, 401, "Authentication failed. User not found.");
 };
 
-module.exports.checkToken = async (req, res) => {
+module.exports.checkTokenResponseMsg = async (req, res) => {
   let token = req.body.token;
   if (token) {
     try {
@@ -197,4 +205,48 @@ module.exports.checkToken = async (req, res) => {
     result: false,
     message: "token is required",
   });
+};
+
+module.exports.refreshToken = async (req, res) => {
+  try {
+    const refreshToken = req.body.refreshToken;
+    if (refreshToken && refreshToken in refreshTokens) {
+      let user = await getUserCurrent(req, res);
+      // Kiểm tra sự hợp lệ của refresh token (thường cần truy vấn vào cơ sở dữ liệu)
+      const isValidRefreshToken = checkToken(refreshToken);
+
+      if (isValidRefreshToken == "token is expired" || !isValidRefreshToken) {
+        return errorResponse(res, 403, "Invalid refresh token");
+      }
+
+      const checkUserName = await userModel.checkExistingField(
+        "username",
+        user.username
+      );
+
+      if (!checkUserName) {
+        return errorResponse(res, 409, "User not found");
+      }
+
+      const { _id, username, role, condition } = checkUserName;
+      var token = jwt.sign({ _id, username, role, condition }, config.secret, {
+        expiresIn: config.expiresIn,
+      });
+
+      // Nếu refresh token hợp lệ, tạo một token truy cập mới và gửi về cho client
+      var token = jwt.sign({ _id, username, role, condition }, config.secret, {
+        expiresIn: config.expiresIn,
+      });
+      const response = {
+        token: token,
+      };
+      // update the token in the list
+      refreshTokens[refreshToken].token = token;
+      return successResponse(res, response, 200, "Success");
+    } else {
+      return errorResponse(res, 404, "Invalid request");
+    }
+  } catch (e) {
+    return errorResponse(res, 401, "Token error verify");
+  }
 };

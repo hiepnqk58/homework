@@ -40,7 +40,7 @@ router.post(
   authController.logout
 );
 
-router.post("/checkToken", authController.checkToken);
-
+router.post("/checkToken", authController.checkTokenResponseMsg);
+router.post("/refreshToken", authController.refreshToken);
 
 module.exports = router;

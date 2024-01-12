@@ -9,8 +9,9 @@ const moment = require("moment");
 const common = require("./../../helper/common");
 const { getUserCurrent } = require("./../../helper/authTokenJWT");
 module.exports.getAll = async (req, res) => {
-  let identDevices = await agentsModel.find().lean();
-  return successResponse(res, identDevices, 200, "Success");
+  console.log(agents);
+  let agents = await agentsModel.find().lean();
+  return successResponse(res, agents, 200, "Success");
 };
 let conditionCheck = [
   { is_deleted: { $exists: false } },

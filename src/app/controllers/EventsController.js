@@ -6,6 +6,7 @@ const {
 const moment = require("moment");
 const common = require("./../../helper/common");
 const { getUserCurrent } = require("./../../helper/authTokenJWT");
+const agentsModel = require("../models/Agents");
 let conditionCheck = [
   { is_deleted: { $exists: false } },
   { is_deleted: false },
@@ -318,7 +319,11 @@ module.exports.insert = async (req, res) => {
       for (let index in arrEvent) {
         let event = arrEvent[index];
         let timeReceive = moment().format("YYYY-MM-DD HH:mm:ss");
-        event = { ...event, receive_time: timeReceive };
+        let checkAgentExists = await agentsModel
+          .findOne({ mac: event.mac })
+          .lean();
+        let agent_id = checkAgentExists?.id || "";
+        event = { ...event, receive_time: timeReceive, agent_id };
         await eventModel.create(event);
       }
       return successResponse(res, "", 200, "Event insert Success");

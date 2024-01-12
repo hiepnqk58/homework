@@ -38,7 +38,6 @@ module.exports = async () => {
           "admin"
         );
         if (!checkUserName) {
-          console.log(111111);
           await userModel.create(newUser);
           log.info("Create user success!!");
         }
