@@ -9,6 +9,7 @@ const swaggerLoader = require("./loaders/swaggerLoader");
 const publicLoader = require("./loaders/publicLoader");
 const winstonLoader = require("./loaders/winstonLoader");
 const https = require("https");
+const http = require("http");
 const fs = require("fs");
 const path = require("path");
 const sslKey = fs.readFileSync(
@@ -55,7 +56,8 @@ async function initApp() {
     res.sendFile(path.join(__dirname, "build", "index.html"));
   });
 
-  var server = https.createServer(options, app);
+  // var server = https.createServer(options, app);
+  var server = http.createServer(app);
   server.listen(env.app.port);
 }
 
