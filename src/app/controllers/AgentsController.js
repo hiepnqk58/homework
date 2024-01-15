@@ -9,7 +9,6 @@ const moment = require("moment");
 const common = require("./../../helper/common");
 const { getUserCurrent } = require("./../../helper/authTokenJWT");
 module.exports.getAll = async (req, res) => {
-  console.log(agents);
   let agents = await agentsModel.find().lean();
   return successResponse(res, agents, 200, "Success");
 };
