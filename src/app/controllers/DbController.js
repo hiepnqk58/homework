@@ -296,9 +296,9 @@ module.exports.add = async (req, res) => {
 module.exports.edit = async (req, res) => {
   try {
     let db = req.body;
-    let dbExists = await dbModel.checkExistingField("name", db.name);
+    let dbExists = await dbModel.checkExistingField("_id", db.id);
     const option = { new: true, upsert: true };
-    const query = { name: db.name };
+    const query = { _id: db.id };
     const update = { ...db };
     if (dbExists) {
       let dbSave = await dbModel.findOneAndUpdate(query, update, option);
