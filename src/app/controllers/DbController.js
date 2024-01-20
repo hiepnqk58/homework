@@ -1,5 +1,6 @@
 const dbModel = require("./../models/Db");
 const { successResponse, errorResponse } = require("../../helper/responseJson");
+const readXlsxFile = require("read-excel-file/node");
 
 module.exports.getAll = async (req, res) => {
   let data = await dbModel.find().lean();
@@ -336,6 +337,7 @@ module.exports.delete = async (req, res) => {
 
 module.exports.import = async (req, res) => {
   try {
+    console.log(req.file);
     let filePath = req.file.path;
     readXlsxFile(filePath).then(async (rows, errors) => {
       rows.shift();
@@ -358,6 +360,7 @@ module.exports.import = async (req, res) => {
       return successResponse(res, "", 200, "Db insert success");
     });
   } catch (error) {
+    console.log(error);
     const result = {
       newToken: req.newToken,
       status: "fail",

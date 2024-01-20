@@ -1,4 +1,5 @@
 const eventModel = require("../models/Event");
+const dbModel = require("../models/Db");
 const {
   successResponse,
   errorResponse,
@@ -316,6 +317,7 @@ module.exports.insert = async (req, res) => {
   try {
     let arrEvent = req.body;
     if (Array.isArray(arrEvent) && arrEvent.length > 0) {
+      let checkAlert = false;
       for (let index in arrEvent) {
         let event = arrEvent[index];
         let timeReceive = moment().format("YYYY-MM-DD HH:mm:ss");
@@ -324,6 +326,27 @@ module.exports.insert = async (req, res) => {
           .lean();
         let agent_id = checkAgentExists?.id || "";
         event = { ...event, receive_time: timeReceive, agent_id };
+        let eventType = event.event_type;
+        let eventInfo = event.event_info;
+        // check event in DB
+        if (["web", "mail", "video", "audio", "youtube"].includes(eventType)) {
+          let arrDB = await dbModel.find({}).lean();
+          for (let i in arrDB) {
+            if (eventInfo.indexOf(arrDB[i].name) !== -1) {
+              checkAlert = true;
+              let alert = {
+                ...event,
+                event_type: arrDB[i].type,
+                level: 3,
+                agent_id,
+                db_name: arrDB[i].name,
+              };
+              await eventModel.create(alert);
+            }
+          }
+        }
+        let level = checkAlert ? 3 : 1;
+        event = { ...event, level };
         await eventModel.create(event);
       }
       return successResponse(res, "", 200, "Event insert Success");
@@ -358,5 +381,19 @@ module.exports.deleteMulti = async (req, res) => {
     return errorResponse(res, 500, "Event insert error.");
   } catch (error) {
     return errorResponse(res, 500, "Event insert error.");
+  }
+};
+
+module.exports.getByType = async (req, res) => {
+  try {
+    let agentId = req.query.agent_id;
+    let type = req.query.type;
+    let level = req.query.level;
+    let event = await eventModel
+      .find({ agent_id: agentId, event_type: type, level })
+      .lean();
+    return successResponse(res, event, 200, " Event get by success");
+  } catch (e) {
+    return errorResponse(res, 500, "Event get by type error");
   }
 };

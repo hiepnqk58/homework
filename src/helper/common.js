@@ -1,7 +1,7 @@
 const requestIp = require("request-ip");
 const jwt = require("jsonwebtoken");
 const fs = require("fs");
-const readline = require('readline');
+const readline = require("readline");
 const os = require("os");
 const axios = require("axios");
 const https = require("https");
@@ -14,9 +14,10 @@ const serialNumber = require("serial-number");
 const { promisify } = require("util");
 const getSerialNumber = promisify(serialNumber);
 
-
-
 const common = {
+  containsIgnoreCase: (parentString, searchString) => {
+    return searchString.includes(parentString);
+  },
   getSerial: async function () {
     try {
       const value = await getSerialNumber();
@@ -123,17 +124,16 @@ const common = {
     return publicIP;
   },
   matchingMacVendor: async (mac, pathfile) => {
-    let result = ""
-    const data = fs.readFileSync(pathfile, 'UTF-8')
-    const lines = data.split(/\r?\n/)
+    let result = "";
+    const data = fs.readFileSync(pathfile, "UTF-8");
+    const lines = data.split(/\r?\n/);
     for (let line of lines) {
       if (line.slice(0, 8) == mac.slice(0, 8)) {
-        result = line.slice(9)
+        result = line.slice(9);
         break;
       }
     }
-    ;
-    return result
+    return result;
   },
   // Format a Date as YYYY-MM-DD hh:mm:ss
 
@@ -179,36 +179,38 @@ const common = {
       current_filter[filter[0]] = filter[2];
       return current_filter;
     }
-     if (filter[1] == "contains") {
+    if (filter[1] == "contains") {
       let current_filter = {};
-      current_filter[filter[0]] = {$regex: new RegExp(filter[2], "i")};
+      current_filter[filter[0]] = { $regex: new RegExp(filter[2], "i") };
       return current_filter;
     }
-     if (filter[1] == "notcontains") {
+    if (filter[1] == "notcontains") {
       let current_filter = {};
-      current_filter[filter[0]] = {$not: { $regex: new RegExp(filter[2], "i") }};
+      current_filter[filter[0]] = {
+        $not: { $regex: new RegExp(filter[2], "i") },
+      };
       return current_filter;
     }
-     if (filter[1] == "startswith") {
+    if (filter[1] == "startswith") {
       let current_filter = {};
-      current_filter[filter[0]] = { $regex: new RegExp(`^${filter[2]}`, "i")};
+      current_filter[filter[0]] = { $regex: new RegExp(`^${filter[2]}`, "i") };
       return current_filter;
     }
-     if (filter[1] == "endswith") {
+    if (filter[1] == "endswith") {
       let current_filter = {};
-      current_filter[filter[0]] = { $regex: new RegExp(`${filter[2]}$`, "i")};
+      current_filter[filter[0]] = { $regex: new RegExp(`${filter[2]}$`, "i") };
       return current_filter;
     }
-      if (filter[1] == "<>") {
+    if (filter[1] == "<>") {
       let current_filter = {};
-      current_filter[filter[0]] = { $ne: filter[2]};
+      current_filter[filter[0]] = { $ne: filter[2] };
       return current_filter;
     }
     if (filter[1] == "and") {
       let even_item = filter.filter((item, index, arr) => {
         return index % 2 === 0;
       });
-  
+
       let sub_filter = even_item.map((item) => common.parseCondition(item));
       return { $and: sub_filter };
     }
@@ -216,12 +218,12 @@ const common = {
       let even_item = filter.filter((item, index, arr) => {
         return index % 2 === 0;
       });
-  
-      let sub_filter = even_item.map((item) =>  common.parseCondition(item));
+
+      let sub_filter = even_item.map((item) => common.parseCondition(item));
       return { $or: sub_filter };
     }
     return {};
-  }
+  },
 };
 
 module.exports = common;

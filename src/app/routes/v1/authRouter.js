@@ -41,6 +41,10 @@ router.post(
 );
 
 router.post("/checkToken", authController.checkTokenResponseMsg);
-router.post("/refreshToken", authController.refreshToken);
+router.post(
+  "/refreshToken",
+  [apiLimiter, authenticate, userPermission],
+  authController.refreshToken
+);
 
 module.exports = router;

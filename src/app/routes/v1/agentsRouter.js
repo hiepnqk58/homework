@@ -10,7 +10,7 @@ const {
 var multer = require("multer");
 const upload = multer({ dest: "uploads/" });
 const validate = require("../../../middlewares/validate.middleware");
-
+var type = upload.single("file");
 router.get("/all", [authenticate, roleUser], agentsController.getAll);
 router.get(
   "/all-paginate",

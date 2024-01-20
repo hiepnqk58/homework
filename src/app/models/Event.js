@@ -8,12 +8,12 @@ var eventsSchema = new Schema(
   {
     agent_id: { type: String },
     computer_name: { type: String },
+    db_name: { type: String },
     local_ip: { type: String },
     mac: { type: String },
     event_type: { type: String },
-    name_fmc: { type: String },
-    unit_name: { type: String },
     event_info: { type: String },
+    level: { type: String },
     receive_time: { type: Array },
   },
   {

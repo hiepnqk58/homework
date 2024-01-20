@@ -62,7 +62,7 @@ module.exports.login = async (req, res) => {
       var refreshToken = jwt.sign(
         { _id, username, role, condition },
         config.secret,
-        { expiresIn: "10d" }
+        { expiresIn: config.expiresInRefresh }
       );
       // await client.set(_id.toString(), token, "EX", 60 * 60);
       data = {
@@ -237,16 +237,34 @@ module.exports.refreshToken = async (req, res) => {
       var token = jwt.sign({ _id, username, role, condition }, config.secret, {
         expiresIn: config.expiresIn,
       });
-      const response = {
+      var refreshTokenNew = jwt.sign(
+        { _id, username, role, condition },
+        config.secret,
+        { expiresIn: config.expiresInRefresh }
+      );
+
+      data = {
+        id: checkUserName._id,
+        username: checkUserName.username,
+        display_name: checkUserName.display_name,
+        role: checkUserName.role,
         token: token,
+        refreshToken: refreshToken,
+        condition,
       };
       // update the token in the list
-      refreshTokens[refreshToken].token = token;
+      refreshTokens[refreshTokenNew] = data;
+      delete refreshTokens[refreshToken];
+      const response = {
+        token: token,
+        refreshToken: refreshTokenNew,
+      };
       return successResponse(res, response, 200, "Success");
     } else {
       return errorResponse(res, 404, "Invalid request");
     }
   } catch (e) {
+    console.log(e);
     return errorResponse(res, 401, "Token error verify");
   }
 };
