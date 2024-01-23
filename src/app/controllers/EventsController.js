@@ -389,8 +389,16 @@ module.exports.getByType = async (req, res) => {
     let agentId = req.query.agent_id;
     let type = req.query.type;
     let level = req.query.level;
+    let startDate = req.query.start_date;
+    let endDate = req.query.end_date;
     let event = await eventModel
-      .find({ agent_id: agentId, event_type: type, level })
+      .find({
+        agent_id: agentId,
+        event_type: type,
+        level,
+        updated_at: { $lte: new Date(endDate) },
+        updated_at: { $gte: new Date(startDate) },
+      })
       .sort({ time_receive: -1 })
       .lean();
     return successResponse(res, event, 200, " Event get by success");
