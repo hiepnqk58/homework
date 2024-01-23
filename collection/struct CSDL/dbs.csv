@@ -1,0 +1,9 @@
+name,field_type,comments
+_id,ObjectId,
+condition,String,
+created_at,Date,
+description,Null,
+is_deleted,Bool,
+name,String,
+type,String,
+updated_at,Date,

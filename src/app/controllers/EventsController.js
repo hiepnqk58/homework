@@ -19,7 +19,7 @@ let conditionCheck = [
  * @returns
  */
 module.exports.getAll = async (req, res) => {
-  let data = await eventModel.find().lean();
+  let data = await eventModel.find().sort({ time_receive: -1 }).lean();
   return successResponse(res, data, 200, "Success");
 };
 
@@ -123,7 +123,7 @@ module.exports.getAllPaginate = async (req, res) => {
     {
       $match: conditionFilter,
     },
-    { $sort: { updated_at: -1 } },
+    { $sort: { time_receive: -1 } },
     { $limit: parseInt(limit) + parseInt(index) },
     { $skip: parseInt(index) },
   ];
@@ -391,6 +391,7 @@ module.exports.getByType = async (req, res) => {
     let level = req.query.level;
     let event = await eventModel
       .find({ agent_id: agentId, event_type: type, level })
+      .sort({ time_receive: -1 })
       .lean();
     return successResponse(res, event, 200, " Event get by success");
   } catch (e) {
