@@ -11,13 +11,13 @@ var agentsSchema = new Schema(
     computer_name: { type: String }, // md5(mac+serial_number)
     serial_number: { type: String },
     os: { type: String },
-    manufacturer: { type: Object },
+    manufacturer: { type: String },
     model: { type: String },
     boot_time: { type: String },
     local_time: { type: String },
     agent_version: { type: String },
     agent_user: { type: String },
-    last_seen: { type: Array },
+    last_seen: { type: String },
     is_deleted: { type: Boolean, default: false },
   },
   {
