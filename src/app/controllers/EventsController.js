@@ -95,12 +95,15 @@ module.exports.getAllPaginate = async (req, res) => {
   }
   if (filter) {
     filter = JSON.parse(filter);
-    conditionFilter = parseCondition(filter);
   }
-  conditionFilter = conditionFilter ? conditionFilter : { $and: [{}] };
+  conditionFilter = filter.length > 0 ? { $and: filter } : { $and: [{}] };
+  console.log(conditionFilter);
   let query = [
     {
       $match: { $and: [{ $and: conditions }, { $or: conditionCheck }] },
+    },
+    {
+      $match: conditionFilter,
     },
     {
       $addFields: {
@@ -119,9 +122,6 @@ module.exports.getAllPaginate = async (req, res) => {
         __v: 0,
         is_deleted: 0,
       },
-    },
-    {
-      $match: conditionFilter,
     },
     { $sort: { time_receive: -1 } },
     { $limit: parseInt(limit) + parseInt(index) },

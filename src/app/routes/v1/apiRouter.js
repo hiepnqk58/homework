@@ -1,6 +1,6 @@
 const express = require("express");
 
-// const dashboardRoute = require("./dashboardsRouter");
+const dashboardRoute = require("./dashboardsRouter");
 const userRoute = require("./usersRouter");
 const eventRoute = require("./eventsRouter");
 const dbRoute = require("./dbRouter");
@@ -31,10 +31,10 @@ const defaultRoutes = [
     path: "/dbs",
     route: dbRoute,
   },
-  // {
-  //   path: "/settings",
-  //   route: settingRoute,
-  // },
+  {
+    path: "/dashboard",
+    route: dashboardRoute,
+  },
 ];
 
 defaultRoutes.forEach((route) => {

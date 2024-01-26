@@ -1,9 +1,13 @@
-const alertModel = require("./../models/Alert");
-const identDeviceModel = require("./../models/IdentDevice");
-const settingModel = require("./../models/Setting");
-const activeDeviceModel = require("./../models/ActiveDevice");
-const softwareManagerModel = require("./../models/SoftwareManager");
-const unitsModel = require("./../models/Unit");
+// const alertModel = require("./../models/Alert");
+// const identDeviceModel = require("./../models/IdentDevice");
+// const settingModel = require("./../models/Setting");
+// const activeDeviceModel = require("./../models/ActiveDevice");
+// const softwareManagerModel = require("./../models/SoftwareManager");
+// const unitsModel = require("./../models/Unit");
+const agentModel = require("./../models/Agents");
+const eventModel = require("./../models/Event");
+const dbModel = require("./../models/Db");
+const userModel = require("./../models/User");
 const {
   successResponse,
   errorResponse,
@@ -854,77 +858,34 @@ module.exports.thongKeViolent = async (req, res) => {
 
 // Cac ham phuc vu dashboard
 //May tinh quan su ket noi Internet
-async function deviceConnectInternet(
-  unit_code,
-  startDate,
-  endDate,
-  conditionsUser
-) {
-  if (unit_code == "all") {
-    let query = [
-      {
-        $match: conditionsUser,
+async function deviceConnectInternet(startDate, endDate) {
+  let query = [
+    {
+      $match: {
+        $and: [
+          { $or: conditionCheck },
+          { updated_at: { $gte: new Date(startDate) } },
+          { updated_at: { $lte: new Date(endDate) } },
+          { alert_type: { $regex: "Internet.*", $options: "$i" } },
+        ],
       },
-      {
-        $match: {
-          $and: [
-            { $or: conditionCheck },
-            { updated_at: { $gte: new Date(startDate) } },
-            { updated_at: { $lte: new Date(endDate) } },
-            { alert_type: { $regex: "Internet.*", $options: "$i" } },
-          ],
-        },
-      },
+    },
 
-      {
-        $group: {
-          _id: "$mac",
-          count: { $sum: 1 },
-        },
+    {
+      $group: {
+        _id: "$mac",
+        count: { $sum: 1 },
       },
-      {
-        $count: "total",
-      },
-    ];
-    let countalert = await alertModel.aggregate(query);
-    if (countalert.length == 0) {
-      return 0;
-    } else {
-      return countalert[0].total;
-    }
+    },
+    {
+      $count: "total",
+    },
+  ];
+  let countalert = await alertModel.aggregate(query);
+  if (countalert.length == 0) {
+    return 0;
   } else {
-    let query = [
-      {
-        $match: conditionsUser,
-      },
-      {
-        $match: {
-          $and: [
-            { $or: conditionCheck },
-            { "idParent.unit_code": unit_code },
-            { updated_at: { $gte: new Date(startDate) } },
-            { updated_at: { $lte: new Date(endDate) } },
-            { alert_type: { $regex: "Internet.*", $options: "$i" } },
-          ],
-        },
-      },
-
-      {
-        $group: {
-          _id: "$mac",
-          count: { $sum: 1 },
-        },
-      },
-      {
-        $count: "total",
-      },
-    ];
-    let countalert = await alertModel.aggregate(query);
-    if (countalert.length == 0) {
-      return 0;
-    } else {
-      return countalert[0].total;
-    }
+    return countalert[0].total;
   }
 }
 
@@ -3156,4 +3117,43 @@ module.exports.tk = async (req, res) => {
     .catch(function (err) {
       console.log(err);
     });
+};
+
+module.exports.total = async (req, res) => {
+  try {
+    let startDate = req.query.start_date;
+    let endDate = req.query.end_date;
+    console.log(startDate, endDate);
+    totalAgent = await agentModel
+      .find(
+        { created_at: { $lte: new Date(endDate) } },
+        { created_at: { $gte: new Date(startDate) } }
+      )
+      .count({});
+    totalAlert = await eventModel
+      .find(
+        { level: 3 },
+        { created_at: { $lte: new Date(endDate) } },
+        { created_at: { $gte: new Date(startDate) } }
+      )
+      .count({});
+    totalDb = await dbModel
+      .find(
+        { created_at: { $lte: new Date(endDate) } },
+        { created_at: { $gte: new Date(startDate) } }
+      )
+      .count({});
+    totalUser = await userModel.find({}).count({});
+    let data = {
+      totalAgent,
+      totalAlert,
+      totalDb,
+      totalUser,
+    };
+    console.log(data);
+    return successResponse(res, data, 200, "Success");
+  } catch (e) {
+    console.log(e);
+    return errorResponse(res, 404, "Dashboard  error.");
+  }
 };
