@@ -3123,7 +3123,11 @@ module.exports.total = async (req, res) => {
   try {
     let startDate = req.query.start_date;
     let endDate = req.query.end_date;
-    console.log(startDate, endDate);
+    let tenMinutesAgo = moment().subtract(10, "minutes");
+    tenMinutesAgo = tenMinutesAgo.format("YYYY-MM-DD HH:mm:ss");
+    totalOnline = await agentModel
+      .find({ last_seen: { $gte: tenMinutesAgo } })
+      .count({});
     totalAgent = await agentModel
       .find(
         { created_at: { $lte: new Date(endDate) } },
@@ -3137,20 +3141,16 @@ module.exports.total = async (req, res) => {
         { created_at: { $gte: new Date(startDate) } }
       )
       .count({});
-    totalDb = await dbModel
-      .find(
-        { created_at: { $lte: new Date(endDate) } },
-        { created_at: { $gte: new Date(startDate) } }
-      )
-      .count({});
+    totalDb = await dbModel.find({}).count({});
     totalUser = await userModel.find({}).count({});
     let data = {
+      totalOnline,
       totalAgent,
       totalAlert,
       totalDb,
       totalUser,
     };
-    console.log(data);
+
     return successResponse(res, data, 200, "Success");
   } catch (e) {
     console.log(e);
