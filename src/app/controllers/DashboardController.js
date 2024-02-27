@@ -17,29 +17,23 @@ const moment = require("moment");
 
 module.exports.total = async (req, res) => {
   try {
-    console.log(2234);
     let startDate = req.query.start_date;
     let endDate = req.query.end_date;
     let tenMinutesAgo = moment().subtract(10, "minutes");
     tenMinutesAgo = tenMinutesAgo.format("YYYY-MM-DD HH:mm:ss");
-    totalOnline = await agentModel
-      .find({ last_seen: { $gte: tenMinutesAgo } })
-      .count({});
-    totalAgent = await agentModel
-      .find(
-        { created_at: { $lte: new Date(endDate) } },
-        { created_at: { $gte: new Date(startDate) } }
-      )
-      .count({});
-    totalAlert = await eventModel
-      .find(
-        { level: 3 },
-        { created_at: { $lte: new Date(endDate) } },
-        { created_at: { $gte: new Date(startDate) } }
-      )
-      .count({});
-    totalDb = await dbModel.find({}).count({});
-    totalUser = await userModel.find({}).count({});
+    const [totalOnline, totalAgent, totalAlert, totalDb, totalUser] =
+      await Promise.all([
+        agentModel.find({ last_seen: { $gte: tenMinutesAgo } }).count({}),
+        agentModel.find({}).count({}),
+        eventModel
+          .find({
+            level: 3,
+            created_at: { $lte: new Date(endDate), $gte: new Date(startDate) },
+          })
+          .count({}),
+        dbModel.find({}).count({}),
+        userModel.find({}).count({}),
+      ]);
     let data = {
       totalOnline,
       totalAgent,
