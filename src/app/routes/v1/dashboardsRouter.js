@@ -9,5 +9,7 @@ const {
 } = require("../../../middlewares/role.middleware");
 
 router.get("/totalCard", dashBoardController.total);
+router.get("/columnChartAlert", dashBoardController.columnChartAlert);
+router.get("/columnChartTypeAlert", dashBoardController.columnChartTypeAlert);
 
 module.exports = router;
