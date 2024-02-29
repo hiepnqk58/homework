@@ -56,12 +56,12 @@ module.exports.getDetail = async (req, res) => {
 module.exports.add = async (req, res) => {
   try {
     // let conditionRole = JSON.parse(req.body.conditions_role);
-    let condition = JSON.parse(req.body.condition);
+    //let condition = JSON.parse(req.body.condition);
     let newUser = {
       ...req.body,
       password_hash: await bcrypt.hash("Abcd@1234", 10),
       // conditions_role: conditionRole,
-      conditions: condition,
+      //conditions: condition,
     };
     const checkUserName = await userModel.checkExistingField(
       "username",
@@ -94,7 +94,7 @@ module.exports.edit = async (req, res) => {
         username: req.body.username,
         full_name: req.body.full_name,
         role: req.body.role,
-        conditions: req.body.condition,
+        //conditions: req.body.condition,
         // conditions_role: conditionRole,
       };
       const checkUserName = await userModel.checkExistingField(
