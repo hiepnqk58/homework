@@ -102,7 +102,7 @@ module.exports.edit = async (req, res) => {
       //   req.body.username
       // );
       let checkUserName = await userModel.findOne({
-        username: username,
+        username: req.body.username,
         _id: { $ne: new mongoose.mongo.ObjectId(userID) },
       });
       if (checkUserName) {
