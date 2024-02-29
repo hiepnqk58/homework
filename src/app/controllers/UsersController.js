@@ -97,10 +97,14 @@ module.exports.edit = async (req, res) => {
         //conditions: req.body.condition,
         // conditions_role: conditionRole,
       };
-      const checkUserName = await userModel.checkExistingField(
-        "username",
-        req.body.username
-      );
+      // const checkUserName = await userModel.checkExistingField(
+      //   "username",
+      //   req.body.username
+      // );
+      let checkUserName = await userModel.findOne({
+        username: username,
+        _id: { $ne: new mongoose.mongo.ObjectId(userID) },
+      });
       if (checkUserName) {
         return errorResponse(res, 409, "User already exist");
       }
