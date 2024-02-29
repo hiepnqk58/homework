@@ -14,6 +14,7 @@ var eventsSchema = new Schema(
     event_type: { type: String },
     event_info: { type: String },
     level: { type: String },
+    event_time: { type: String },
     receive_time: { type: Array },
   },
   {
