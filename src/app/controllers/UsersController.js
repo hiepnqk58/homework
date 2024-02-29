@@ -5,6 +5,8 @@ const {
   errorResponse,
 } = require("./../../helper/responseJson");
 const bcrypt = require("bcryptjs/dist/bcrypt");
+var ObjectID = require("mongodb").ObjectID;
+var mongoose = require("mongoose");
 
 module.exports.getAllPaginate = async (req, res) => {
   let limit = req.query.take || 12;
