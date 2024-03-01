@@ -18,7 +18,7 @@ router.get(
   agentsController.getAllPaginate
 );
 router.get("/detail", [authenticate, roleUser], agentsController.getDetail);
-router.post("/insert", [authenticate, roleUser], agentsController.insert);
+router.post("/insert", agentsController.insert);
 router.post("/edit", [authenticate, roleUser], agentsController.edit);
 router.post("/delete", [authenticate, roleSuperAdmin], agentsController.delete);
 router.get("/search", [authenticate, roleUser], agentsController.search);
