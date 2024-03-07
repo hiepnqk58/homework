@@ -18,7 +18,7 @@ router.get(
   eventsController.getAllPaginate
 );
 router.get("/detail", [authenticate, roleUser], eventsController.getDetail);
-router.post("/insert", [authenticate, roleUser], eventsController.insert);
+router.post("/insert", eventsController.insert);
 router.post("/delete", [authenticate, roleSuperAdmin], eventsController.delete);
 router.get("/search", [authenticate, roleUser], eventsController.search);
 router.get("/getByType", [authenticate, roleUser], eventsController.getByType);
