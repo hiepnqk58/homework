@@ -6,6 +6,7 @@ const eventRoute = require("./eventsRouter");
 const dbRoute = require("./dbRouter");
 const agentRoute = require("./agentsRouter");
 const authRoute = require("./authRouter");
+const toolRoute = require("./toolsRouter");
 // const settingRoute = require("./settingsRouter");
 
 const router = express.Router();
@@ -34,6 +35,10 @@ const defaultRoutes = [
   {
     path: "/dashboard",
     route: dashboardRoute,
+  },
+  {
+    path: "/tools",
+    route: toolRoute,
   },
 ];
 
