@@ -24,8 +24,8 @@ function getDate() {
 
 module.exports.upFile = async (req, res) => {
   let today = getDate();
-  let comInfo = JSON.parse(req.body.comInfo);
-  let macCom = comInfo.Mac ? comInfo.Mac : Date.now();
+  //let comInfo = JSON.parse(req.body.comInfo);
+  let macCom = Date.now();
   let oldPath = ".\\" + req.file.path;
   let newPath =
     `.\\uploads\\${today}\\${macCom}\\${req.file.originalname}` + ".sc";

@@ -149,7 +149,11 @@ module.exports.changeInformation = async (req, res) => {
     _id: { $eq: new mongoose.mongo.ObjectId(id) },
   });
   if (existsUser) {
-    userData = { ...userData, password_hash: existsUser.password };
+    userData = {
+      ...userData,
+      password_hash: existsUser.password,
+      role: existsUser.role,
+    };
     let data = await userModel.findByIdAndUpdate(id, userData, { new: true });
     return successResponse(res, data, 200, "Change information success!");
   } else {
