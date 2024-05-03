@@ -61,7 +61,7 @@ module.exports.add = async (req, res) => {
     //let condition = JSON.parse(req.body.condition);
     let newUser = {
       ...req.body,
-      password_hash: await bcrypt.hash(req.body.password, 10), // "Abcd@1234"
+      password_hash: await bcrypt.hash("Abcd@1234", 10),
       // conditions_role: conditionRole,
       //conditions: condition,
     };
@@ -92,20 +92,13 @@ module.exports.edit = async (req, res) => {
     let user = await userModel.findById(userID).lean();
     // let conditionRole = JSON.parse(req.body.conditions_role);
     if (user) {
-      let editUser = req.body.password
-        ? {
-            username: req.body.username,
-            full_name: req.body.full_name,
-            role: req.body.role,
-            password_hash: await bcrypt.hash(req.body.password, 10), // "Abcd@1234"
-            //conditions: req.body.condition,
-            // conditions_role: conditionRole,
-          }
-        : {
-            username: req.body.username,
-            full_name: req.body.full_name,
-            role: req.body.role,
-          };
+      let editUser = {
+        username: req.body.username,
+        full_name: req.body.full_name,
+        role: req.body.role,
+        //conditions: req.body.condition,
+        // conditions_role: conditionRole,
+      };
       // const checkUserName = await userModel.checkExistingField(
       //   "username",
       //   req.body.username
