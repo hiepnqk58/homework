@@ -4,7 +4,7 @@ const bannerLogger = require("./libs/banner");
 
 const expressLoader = require("./loaders/expressLoader");
 const mongooseLoader = require("./loaders/mongooseLoader");
-
+const Database = require("./loaders/initMongodb");
 const swaggerLoader = require("./loaders/swaggerLoader");
 const publicLoader = require("./loaders/publicLoader");
 const winstonLoader = require("./loaders/winstonLoader");
@@ -38,8 +38,11 @@ async function initApp() {
   winstonLoader();
 
   // Database
-  await mongooseLoader();
+  // await mongooseLoader();
 
+  await Database.getInstance();
+  // const { checkOverLoad } = require("../src/helper/checkConectMongo");
+  // checkOverLoad();
   // express
   const app = expressLoader();
   // monitor
@@ -55,14 +58,7 @@ async function initApp() {
   app.get("/*", function (req, res) {
     res.sendFile(path.join(__dirname, "build", "index.html"));
   });
-
-  // var server = https.createServer(options, app);
-  var server = http.createServer(app);
-  server.listen(env.app.port);
+  return app;
 }
 
-initApp()
-  .then(() => {
-    bannerLogger(log);
-  })
-  .catch((error) => log.error("Application is crashed: " + error));
+module.exports = initApp;

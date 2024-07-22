@@ -1,0 +1,12 @@
+[2024-07-22 09:18:01] error: [middlewares:error.middleware] Error: "username" is required, "password" is required - 
+
+[2024-07-22 09:18:11] error: [middlewares:error.middleware] Error: "username" is required, "password" is required - 
+
+[2024-07-22 09:34:28] error: [loaders:initMongodb] Failed to connect to MongoDB - Cannot read properties of undefined (reading 'superAdmin') - 
+
+[2024-07-22 09:34:28] error: [:server] Application is crashed: Error: Failed to connect to MongoDB - 
+
+[2024-07-22 09:38:25] error: [:server] Application is crashed: ReferenceError: app is not defined - 
+
+[2024-07-22 09:38:34] error: [:server] Application is crashed: ReferenceError: app is not defined - 
+

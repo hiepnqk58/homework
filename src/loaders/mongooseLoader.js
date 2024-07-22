@@ -21,6 +21,7 @@ module.exports = async () => {
       .connect(env.database.connection, {
         useNewUrlParser: true,
         useUnifiedTopology: true,
+        maxPoolSize: 50,
       })
       .then(async () => {
         log.info("Successfully for MongoDB connected!!");
@@ -49,4 +50,9 @@ module.exports = async () => {
     log.error(`Failed to connect to MongoDB - ${err.message}`);
     throw new Error(`Failed to connect to MongoDB`);
   }
+
+  // if (1 === 1) {
+  //   mongoose.set("debug", true);
+  //   mongoose.set("debug", { color: true });
+  // }
 };
