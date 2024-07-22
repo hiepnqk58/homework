@@ -1,10 +1,8 @@
 var mongoose = require("mongoose");
-autoIncrement = require("mongoose-auto-increment");
 const moment = require("moment");
 const { boolean } = require("joi");
 const { Integer } = require("read-excel-file");
 var Schema = mongoose.Schema;
-autoIncrement.initialize(mongoose.connection);
 var settingsSchema = new Schema(
   {
     id: { type: String, default: 1 },
@@ -121,12 +119,6 @@ function transformDoc(doc) {
   delete doc._id;
   delete doc.__v;
 }
-
-settingsSchema.plugin(autoIncrement.plugin, {
-  model: "settings",
-  field: "id",
-  startAt: 1,
-});
 
 var settingsModel = mongoose.model("settings", settingsSchema, "settings");
 module.exports = settingsModel;

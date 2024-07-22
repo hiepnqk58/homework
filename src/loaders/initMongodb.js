@@ -20,8 +20,6 @@ class Database {
     mongoose.set("strictQuery", false);
     try {
       await mongoose.connect(env.database.connection, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
         maxPoolSize: 50,
       });
       log.info("Successfully connected to MongoDB!");

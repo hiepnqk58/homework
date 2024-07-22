@@ -1,9 +1,9 @@
 var mongoose = require("mongoose");
 var Schema = mongoose.Schema;
-const { toJSON, paginate } = require("./plugins");
+const { toJSON, paginate, autoIncrement } = require("./plugins");
 const moment = require("moment");
-autoIncrement = require("mongoose-auto-increment");
-autoIncrement.initialize(mongoose.connection);
+// autoIncrement = require("mongoose-auto-increment");
+// autoIncrement.initialize(mongoose.connection);
 var eventsSchema = new Schema(
   {
     agent_id: { type: String },
@@ -58,11 +58,7 @@ function transformDoc(doc) {
 
 eventsSchema.plugin(toJSON);
 eventsSchema.plugin(paginate);
-eventsSchema.plugin(autoIncrement.plugin, {
-  model: "events",
-  field: "auto_increment",
-  startAt: 1,
-});
+eventsSchema.plugin(autoIncrement, { field: "auto_increment" });
 
 var eventsModel = mongoose.model("events", eventsSchema, "events");
 module.exports = eventsModel;
