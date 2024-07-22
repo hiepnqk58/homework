@@ -81,7 +81,7 @@ module.exports.login = async (req, res) => {
     return errorResponse(res, 401, "Token is fail");
   }
 
-  return errorResponse(res, 401, "Authentication failed. User not found.");
+  return errorResponse(res, 400, "Authentication failed. User not found.");
 };
 
 /**
@@ -120,7 +120,7 @@ module.exports.changePassword = async (req, res) => {
     }
     try {
       let newActions = {
-        password: await bcrypt.hash(req.body.new_password, 10),
+        password_hash: await bcrypt.hash(req.body.new_password, 10),
       };
       let data = await userModel.findByIdAndUpdate(id, newActions, {
         new: true,
